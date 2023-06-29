@@ -6,7 +6,7 @@ import { Stack, StackProps, Stage, StageProps, pipelines, aws_logs } from 'aws-c
 import { MlStack } from './ml/ml-stack';
 import { IotStack } from './iot/iot-stack';
 
-export class CicdStack extends Stack {
+export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
