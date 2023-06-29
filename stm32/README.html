@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="./_htmresc/mini-st_2020_raw.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="freertos-stm32u5-iot-reference">FreeRTOS STM32U5 IoT
+Reference</h1>
+<h2 id="introduction">Introduction</h2>
+<p>This project demonstrates how to integrate modular <a
+href="https://www.freertos.org/RTOS.html">FreeRTOS kernel</a> and <a
+href="https://www.freertos.org/libraries/categories.html">libraries</a>
+with hardware enforced security to build more secure updatable cloud
+connected applications. The project is pre-configured to run on the <a
+href="https://www.st.com/en/evaluation-tools/b-u585i-iot02a.html">STM32U585
+IoT Discovery Kit</a> which includes an kit which includes an <a
+href="https://www.st.com/en/microcontrollers-microprocessors/stm32u5-series.html">STM32U5</a>
+microcontroller.</p>
+<p>The <em>Projects</em> directory consists of a <a
+href="Projects/b_u585i_iot02a_ntz">Non-TrustZone</a> and a <a
+href="Projects/b_u585i_iot02a_tfm">Trusted-Firmware-M-Enabled</a>
+project which both demonstrate connecting to AWS IoT Core and utilizing
+many of the services available via the MQTT protocol.</p>
+<p>Refer to the <a href="Getting_Started_Guide.md">Getting Started
+Guide</a> for step by step instructions on setting up your development
+environment.</p>
+<p>This includes demonstration tasks for the following AWS services: *
+<a
+href="https://docs.aws.amazon.com/iot/latest/developerguide/iot-device-shadows.html">AWS
+IoT Device Shadow</a> * <a
+href="https://docs.aws.amazon.com/iot/latest/developerguide/device-defender.html">AWS
+IoT Device Defender</a> * <a
+href="https://docs.aws.amazon.com/iot/latest/developerguide/iot-jobs.html">AWS
+IoT Jobs</a> * <a
+href="https://docs.aws.amazon.com/iot/latest/developerguide/mqtt-based-file-delivery.html">MQTT
+File Delivery</a> * <a
+href="https://docs.aws.amazon.com/freertos/latest/userguide/freertos-ota-dev.html">AWS
+IoT OTA Update</a></p>
+<p>The demo projects both connect to AWS IoT core via the included Wi-Fi
+module and use the <a
+href="https://github.com/FreeRTOS/coreMQTT-Agent">CoreMQTT-Agent</a>
+library to share a single MQTT connection among multiple tasks. These
+tasks publish environemnt and motion sensor data from a subset of the
+sensor available on the development board, and demonstrate use of the
+AWS IoT Device Shadow and Device Defender services. For more details on
+the feature, see the <a href="https://www.freertos.org/STM32U5/">ST
+Featured IoT Reference Integration</a> page on FreeRTOS.org.</p>
+<h2 id="aws-iot-core-demo-tasks">AWS IoT Core Demo Tasks</h2>
+<ul>
+<li>MQTT Agent</li>
+<li>IoT Defender</li>
+<li>OTA Update</li>
+<li>Environment Sensor Publishing</li>
+<li>Motion Sensor Publishing</li>
+</ul>
+<h2 id="key-software-components">Key Software Components</h2>
+<h3 id="lwip-tcpip-stack">LWIP TCP/IP Stack</h3>
+<p>See <a href="https://github.com/lwip-tcpip/lwip">lwIP</a> for
+details.</p>
+<h3 id="mbedtls-3.1.0-tls-and-cryptography-library">Mbedtls 3.1.0 TLS
+and Cryptography library</h3>
+<p>See <a
+href="https://github.com/Mbed-TLS/mbedtls/tree/d65aeb37349ad1a50e0f6c9b694d4b5290d60e49">MbedTLS</a>
+for details.</p>
+<h3 id="command-line-interface-cli">Command Line Interface (CLI)</h3>
+<p>The CLI interface located in the Common/cli directory is used to
+provision the device. It also provides other Unix-like utilities. See <a
+href="Common/cli/ReadMe.md">Common/cli</a> for details.</p>
+<h3 id="key-value-store">Key-Value Store</h3>
+<p>The key-value store located in the Common/kvstore directory is used
+to store runtime configuration values in non-volatile flash memory. See
+<a href="Common/kvstore/ReadMe.md">Common/kvstore</a> for details.</p>
+<h3 id="pkiobject-api">PkiObject API</h3>
+<p>The PkiObject API takes care of some of the mundane tasks in
+converting between different representations of cryptographic objects
+such as public keys, private keys, and certificates. See <a
+href="Common/crypto/ReadMe.md">Common/crypto</a> for details.</p>
+<h3 id="mbedtls-transport">Mbedtls Transport</h3>
+<p>The <em>Common/net/mbedtls_transport.c</em> file contains a transport
+layer implementation for coreMQTT and coreHTTP which uses mbedtls to
+encrypt the connection in a way supported by AWS IoT Core.</p>
+<p>Optionally, client key / certificate authentication may be used with
+the mbedtls transport or this parameter may be set to NULL if not
+needed. ### Cloning the Repository To clone using HTTPS:</p>
+<pre><code>git clone https://github.com/FreeRTOS/iot-reference-stm32u5.git --recurse-submodules</code></pre>
+<p>Using SSH:</p>
+<pre><code>git clone git@github.com:FreeRTOS/iot-reference-stm32u5 --recurse-submodules</code></pre>
+<p>If you have downloaded the repo without using the
+<code>--recurse-submodules</code> argument, you should run:</p>
+<pre><code>git submodule update --init --recursive</code></pre>
+<h2 id="running-the-demos">Running the demos</h2>
+<p>To get started running demos, see the <a
+href="Getting_Started_Guide.md">Getting Started Guide</a>.</p>
+<h2 id="contribution">Contribution</h2>
+<p>See <a
+href="https://github.com/FreeRTOS/iot-reference-stm32u5/blob/main/CONTRIBUTING.md">CONTRIBUTING</a>
+for more information.</p>
+<h2 id="license">License</h2>
+<p>Source code located in the <em>Projects</em>, <em>Common</em>,
+<em>Middleware/AWS</em>, and <em>Middleware/FreeRTOS</em> directories
+are available under the terms of the MIT License. See the LICENSE file
+for more details.</p>
+<p>Other libraries located in the <em>Drivers</em> and
+<em>Middleware</em> directories are available under the terms specified
+in each source file.</p>
+</body>
+</html>

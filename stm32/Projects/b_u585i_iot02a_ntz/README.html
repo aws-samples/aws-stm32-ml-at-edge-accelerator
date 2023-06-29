@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../../_htmresc/mini-st_2020_raw.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="non-trustzone-demo-project">Non-TrustZone Demo Project</h1>
+<p>The following Readme.md contains instructions on getting the
+non-trustzone (b_u585i_iot02a_ntz) version of the project up and
+running. It connects to AWS IoT Core and publishes sensor data.</p>
+<h2 id="software-components">Software Components</h2>
+<h3 id="littlefs">Littlefs</h3>
+<p>The littlefs library is used as a flash filesystem to demonstrate the
+external Octal-SPI NOR flash available on the b_u585i_iot02a board.</p>
+<p>The littlefs port for this board can be found in the <a
+href="Src/fs">Src/fs</a> directory.</p>
+<h3 id="corepkcs11">CorePKCS11</h3>
+<p>The CorePKCS11 library is used to ease integration and simulate the
+PKCS11 API that a secure element sdk might provide by handling
+cryptographic operations with mbedtls.</p>
+<p>The CorePKSA11 PAL implementation that is used in the port can be
+found in the <a
+href="Src/crypto/core_pkcs11_pal_littlefs.c">Src/crypto/core_pkcs11_pal_littlefs.c</a>
+file.</p>
+<h3 id="freertos-ota-platform-abstraction-layer-implementation">FreeRTOS
+OTA Platform Abstraction Layer implementation</h3>
+<p>The OTA PAL is implemented to leverage the dual bank architecture.
+The internal flash memory is divided into two banks of size 1MB each, an
+active bank and a non-active bank. The bank split is achieved by setting
+the Dual Bank Option Byte Register to the enabled state. The loader
+starts the execution of the image from a well-defined start address in
+the flash layout. At factory reset, a valid image is programmed into the
+first bank and the bank is mapped to the start address known to the
+loader. During an OTA Update, the new firmware image is first staged to
+the second bank by the current program, running on the active bank. This
+is achieved by the dual bank feature of the platform, which allows
+execution in place from one bank while programming flash on the other
+bank. Once the new image is staged and its signature is verified, the
+current firmware swaps the bank by oggling the SWAP_BANK option byte
+register. Toggling the SWAP_BANK register remaps the second bank
+transparently onto the starting address already known to the loader. On
+the next reset, the loader starts execution of the new image from the
+second bank and tests that the image is good and can connect to AWS IoT
+core.</p>
+<h2 id="importing-the-projects-into-stm32cubeide">Importing the projects
+into STM32CubeIDE</h2>
+<p>The b_u585i_iot02a_ntz project does not use the TrustZone
+capabilities of the STM32U5 microcontroller.</p>
+<p>Follow the instructions in the repository <a
+href="../../README.md">README.md</a> to import the Projects into
+STM32CubeIDE.</p>
+<h2 id="building-and-flashing-the-firmware-image">Building and Flashing
+the Firmware Image</h2>
+<p>After importing the b_u585i_iot02a_ntz project into STM32CubeIDE,
+Build the project by highlighting it in the <em>Project Exporer</em>
+pane and then clicking <strong>Project -&gt; Build Project</strong> from
+the menu at the top of STM32CubeIDE.</p>
+<p>To write the newly built image to flash, select the Run As button,
+then select the <code>Flash_ntz</code> target.</p>
+<h2 id="flashing-the-image-from-the-commandline">Flashing the Image from
+the commandline</h2>
+<p>Check that the STM32CProgrammer_CLI binary is in your PATH and run
+the following:</p>
+<pre><code># Add tools directory to your PATH
+source tools/env_setup.sh
+
+# Change to the project directory
+cd Projects/b_u585i_iot02a_ntz
+
+# Run the flashing script.
+stn32u5_tool.sh flash_ntz</code></pre>
+<h2 id="performing-over-the-air-ota-firmware-update">Performing
+Over-the-air (OTA) Firmware Update</h2>
+<p>The project shows an IoT reference implementation of how to integrate
+FreeRTOS libraries on STM32U5 platform to perform OTA update with AWS
+IoT using the <em>non trustzone</em> hardware capablities.</p>
+<p>The demo runs FreeRTOS OTA agent as one of the RTOS tasks in
+background, which waits for OTA updates from cloud.</p>
+<p>The non-trustzone version of the demo leverages the dual-bank
+architecutre of the internal flash memory. The 2MB internal flash is
+split into two banks of 1MB each.</p>
+<p>While the main firmware is running on one bank, an ota update is
+installed on the second bank.</p>
+</body>
+</html>

@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Getting_Started_Guide</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="./_htmresc/mini-st_2020_raw.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="setting-up-your-development-environment">Setting Up your
+Development Environment</h1>
+<h2 id="step-1-setup-your-development-board">Step 1: Setup your
+development board</h2>
+<figure>
+<img
+src="https://user-images.githubusercontent.com/1633960/164777317-d9f922cf-8019-4b29-8145-c92b0c4a5b85.png"
+alt="b_u585_iot02a" />
+<figcaption aria-hidden="true">b_u585_iot02a</figcaption>
+</figure>
+<ol type="1">
+<li>Verify that the 5V_USB_STL and JP3 jumpers are bridged and the
+remaining jumpers are not bridged.</li>
+<li>Check that the BOOT0 switch is in the position closest to the STLINK
+USB connector.</li>
+<li>Connect a USB micro-B cable between the USB_STLK connector and your
+computer.</li>
+</ol>
+<p>The USB STLK port is located to the right of the MXCHIP WiFi module
+in the figure. It is used for power supply, programming, debugging, and
+interacting with the application via UART over USB.</p>
+<h3 id="update-the-wifi-module-firmware">Update the WiFi module
+Firmware</h3>
+<p>Depending on the board revision in use, you may need to update the
+wifi firmware for your board. For more information, visit the <a
+href="https://www.st.com/en/development-tools/x-wifi-emw3080b.html">EMW3080</a>
+page on the ST Microelectronics website.</p>
+<ol type="1">
+<li>Download the <a
+href="https://www.st.com/content/ccc/resource/technical/software/firmware/group1/48/a2/e8/27/7f/ae/4b/26/x-wifi-emw3080b/files/x-wifi-emw3080b.zip/jcr:content/translations/en.x-wifi-emw3080b.zip">EMW3080
+update tool</a> from the STMicroelectronics website.</li>
+<li>Unzip the archive.</li>
+<li>Flip the SW1_BOOT0 switch to the <strong>1</strong> / left
+position.</li>
+<li>Press the RST button to reset the STM32U5 MCU.</li>
+<li>Drag and drop the <em>EMW3080updateV2.1.11RevC.bin</em> binary from
+the archive that was unzipped in step 2 to the
+<strong>DIS_U585AI</strong> usb mass storage device.</li>
+<li>Wait for the mass storage device to disconnect and then
+reconnect.</li>
+<li>Return SW1_BOOT0 to the <strong>0</strong> / right position.</li>
+<li>Switch the SW2 BOOT switch to the <strong>0</strong> position.</li>
+<li>Press the RST button again.</li>
+<li>Connect a serial terminal program to the STlink USB-&gt;UART port.
+&gt; Note: You may need to remap line endings for it to display
+correctly. &gt; &gt; Input: LF -&gt; CRLF &gt; &gt; Output CR -&gt; CRLF
+&gt; &gt; For picocom, the correct mapping arguments are:
+<code>--imap lfcrlf --omap crcrlf</code></li>
+<li>Press the blue “USER” button and wait for the firmware update to
+complete.</li>
+<li>Switch the SW2 BOOT switch back to the <strong>1</strong>
+position.</li>
+</ol>
+<h2 id="step-2-install-prerequisites-packages">Step 2: Install
+Prerequisites Packages</h2>
+<p>Using your platform’s package manager, install the following
+prerequisites: - Python 3.10 with pip - perl - cmake - git</p>
+<h3 id="windows">Windows</h3>
+<p>There are many options for downloading and installing packages on
+windows. Use the approach you are most comfortable with.</p>
+<h4 id="windows-decide-which-shell-you-will-use">Windows: Decide which
+shell you will use</h4>
+<p>Windows has a wide variety of unix or posix-like shells available.
+This guide will assume you are using GitBash which is included in the
+git for windows package.</p>
+<h4 id="windows-manual-installation-without-a-package-manager">Windows:
+Manual Installation without a Package Manager</h4>
+<p>Download and install the latest version of each of the following
+packages: - <a href="https://www.python.org/downloads/">python</a> (with
+pip) - <a href="https://www.perl.org/get.html">perl</a> - <a
+href="https://cmake.org/download/">cmake</a> - <a
+href="https://git-scm.com/downloads">git</a></p>
+<h4 id="windows-installation-with-scoop-package-manager">Windows:
+Installation with Scoop Package Manager</h4>
+<p>With <a href="https://scoop.sh/">scoop</a> package manager installed,
+run the following command from your preferred shell.</p>
+<pre><code>scoop install python cmake perl</code></pre>
+<h4 id="windows-installation-with-chocolatey-package-manager">Windows:
+Installation with Chocolatey Package Manager</h4>
+<p>With <a href="https://chocolatey.org/install">chocolatey</a>
+installed, run the following commands from your preferred shell.</p>
+<pre><code>choco install cmake
+choco install wget
+choco install git
+choco install python3
+choco install perl</code></pre>
+<h4 id="windows-enable-the-git-longpaths-option">Windows: Enable the git
+longpaths option:</h4>
+<p>On windows, long path names can present problems with some programs
+that utilize legacy APIs. Enable long path support in git so that git
+knows long paths are supported by STM32CubeIDE and the included
+toolchain.</p>
+<p>Open GitBash or a similar unix-like shell environment and run the
+following command:</p>
+<pre><code>git config --system core.longpaths true</code></pre>
+<h4 id="windows-add-bash.exe-to-your-path">Windows: Add bash.exe to your
+Path:</h4>
+<p>In order to use the stm32u5_tool.sh script and the related
+STM32CubeIDE launch files, you must include bash.exe in your system
+path.</p>
+<ol type="1">
+<li><p>Locate your preferred version of bash.exe and determine the
+windows path to it.</p>
+<p>For reference, the default location for GitBash is
+<code>C:\Program Files\Git\bin</code>.</p></li>
+<li><p>Run the following command to open the environment variable editor
+from Control Panel:</p></li>
+</ol>
+<pre><code>rundll32 sysdm.cpl,EditEnvironmentVariables</code></pre>
+<ol start="3" type="1">
+<li><p>Select the “Path” user environment variable and click
+“Edit”.</p></li>
+<li><p>Select “New” and then paste the path to the directory containing
+bash.exe found above.</p></li>
+<li><p>Press OK and OK to exit the environment variable editor.</p></li>
+<li><p>Log out of your windows session and then log back in to allow the
+environment variable changes to take effect.</p></li>
+</ol>
+<h3 id="linux">Linux</h3>
+<p>Install dependencies using your distribution’s package manager:</p>
+<h4 id="debian-based-.deb-apt">Debian based (.deb / apt)</h4>
+<pre><code>sudo apt install build-essential cmake python3 git libncurses5 libusb-1.0-0-dev</code></pre>
+<h4 id="redhat-.rpm-dnf-yum">Redhat (.rpm / dnf / yum)</h4>
+<pre><code>sudo dnf install -y cmake python3 git ncurses-libs libusb
+sudo dnf groupinstall -y &quot;Development Tools&quot; &quot;Development Libraries&quot; --skip-broken</code></pre>
+<h3 id="mac-os">Mac OS</h3>
+<h4 id="with-homebrew-package-manager">With Homebrew package
+manager</h4>
+<p>Install the hombrew package manager from <a
+href="https://brew.sh/">brew.sh</a></p>
+<pre><code>brew install python cmake git libusb greadlink coreutils</code></pre>
+<h4 id="link-gnu-core-utilities-into-system-bin-directory">Link GNU core
+utilities into system bin directory</h4>
+<pre><code>sudo ln -s /usr/local/Cellar/coreutils/9.0_1/bin/realpath /usr/local/bin/realpath
+sudo ln -s /usr/local/Cellar/coreutils/9.0_1/bin/readlink /usr/local/bin/readlink</code></pre>
+<h2 id="step-3-clone-the-repository-and-submodules"><del>Step 3: Clone
+the repository and submodules</del></h2>
+<p>Unzipping the contents of the X-CUBE-AWS package downloaded from
+www.st.com replaces this “clone” step.</p>
+<h2 id="step-4-setup-your-aws-account-with-awscli">Step 4: Setup your
+AWS account with awscli</h2>
+<p>Follow the instructions to <a
+href="https://docs.aws.amazon.com/iot/latest/developerguide/setting-up.html">Create
+an IAM user</a>.</p>
+<p>Run the following command to set up the aws cli.</p>
+<pre><code>aws configure</code></pre>
+<p>Fill in the AWS Access Key ID, AWS Secret Access Key, and Region
+based on the IAM user your created in the previous step.</p>
+<p>If you have already configured your AWS account, you may accept the
+existing default values listed in [brackets] by pressing the enter
+key.</p>
+<pre><code>$ aws configure
+AWS Access Key ID []: XXXXXXXXXXXXXXXXXXXX
+AWS Secret Access Key []: YYYYYYYYYYYYYYYYYYYY
+Default region name [us-west-2]:
+Default output format [json]:</code></pre>
+<h2 id="step-5-install-stm32cubeide">Step 5: Install STM32CubeIDE</h2>
+<p>Download the latest version of STM32CubeIDE from the <a
+href="https://www.st.com/en/development-tools/stm32cubeide.html">STMicroelectronics
+website</a>.</p>
+<p>At the time of this writing, Version 1.9.0 was the latest release: -
+<a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/1e/53/08/15/0f/e2/4c/a6/stm32cubeide_win/files/st-stm32cubeide_1.9.0_12015_20220302_0855_x86_64.exe.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_x86_64.exe.zip">Windows</a>
+- <a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/05/31/11/3e/76/1d/40/01/stm32cubeide_mac/files/st-stm32cubeide_1.9.0_12015_20220302_0855_x86_64.dmg.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_x86_64.dmg.zip">Mac
+OS</a> - <a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/13/d4/6b/b0/d2/fd/47/6d/stm32cubeide_deb/files/st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh.zip">Debian
+Package bundle</a> - <a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/e1/03/5a/6d/f4/f5/45/2c/stm32cubeide_rpm/files/st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.rpm_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.rpm_bundle.sh.zip">Redhat
+Package bundle</a> - <a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/6c/ed/b5/05/5d/2f/44/f3/stm32cubeide_lnx/files/st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.sh.zip">Generic
+Linux Bundle</a></p>
+<p>Abridged installation instructions are included below. Please refer
+to the <a
+href="https://www.st.com/resource/en/user_manual/um2563-stm32cubeide-installation-guide-stmicroelectronics.pdf">STM32CubeIDE
+Installation guide</a> and the included instructions for your platform
+if additional help is needed.</p>
+<p>The projects in this repository have been verified with versions
+1.8.0 and 1.9.0 of STM32CubeIDE.</p>
+<h3 id="windows-normal-install">Windows Normal Install</h3>
+<ol type="1">
+<li>Download the <a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/1e/53/08/15/0f/e2/4c/a6/stm32cubeide_win/files/st-stm32cubeide_1.9.0_12015_20220302_0855_x86_64.exe.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_x86_64.exe.zip">STM32CubeIDE
+windows zip archive</a>.</li>
+<li>Unzip the package by double-clicking.</li>
+<li>Run the extracted installer executable.</li>
+</ol>
+<h3 id="ubuntu-linux-debian-linux-etc-deb-package">Ubuntu Linux, Debian
+Linux, etc (deb package)</h3>
+<p>Open a terminal window and follow the steps below to install
+STM32CubeIDE on a Debian based Linux machine.</p>
+<p>Download the STM32CubeIDE Linux generic installer package</p>
+<pre><code>wget &lt;URL HERE&gt;</code></pre>
+<p>Extract the package</p>
+<pre><code>unzip en.st-stm32cubeide_*_amd64.deb_bundle.sh.zip</code></pre>
+<p>Add execute permissions to the install package</p>
+<pre><code>chmod +x st-stm32cubeide_*_amd64.deb_bundle.sh</code></pre>
+<p>Extract the debian packages from the bundle:</p>
+<pre><code>mkdir -p cubeide_install
+./st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.deb_bundle.sh --tar xvf --directory cubeide_install .</code></pre>
+<p>Install the debian packages</p>
+<pre><code>export LICENSE_ALREADY_ACCEPTED=1
+sudo apt install -y ./cubeide_install/st-stm32cubeide-1.9.0-12015-20220302-0855_amd64.deb ./cubeide_install/st-stlink-udev-rules-1.0.3-2-linux-all.deb ./cubeide_install/st-stlink-server-2.1.0-1-linux-amd64.deb</code></pre>
+<p>Start the IDE</p>
+<pre><code>/opt/st/stm32cubeide_1.9.0/stm32cubeide_wayland
+# Or
+/opt/st/stm32cubeide_1.9.0/stm32cubeide</code></pre>
+<h3 id="redhat-derivatives-rpm-package">Redhat derivatives (rpm
+package)</h3>
+<p>Open a terminal window and follow the steps below to install
+STM32CubeIDE on a Redhat based linux machine.</p>
+<p>Download the <a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/e1/03/5a/6d/f4/f5/45/2c/stm32cubeide_rpm/files/st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.rpm_bundle.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.rpm_bundle.sh.zip">STM32CubeIDE
+linux rpm installer package</a></p>
+<pre><code>wget &lt;URL HERE&gt;</code></pre>
+<p>Extract the package</p>
+<pre><code>unzip en.st-stm32cubeide_*amd64.rpm_bundle.sh.zip</code></pre>
+<p>Add execute permissions to the install package</p>
+<pre><code>chmod +x st-stm32cubeide_*amd64.rpm_bundle.sh</code></pre>
+<p>Start the installation script and follow the prompts on the command
+line.</p>
+<pre><code>sudo ./st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.rpm_bundle.sh</code></pre>
+<h3 id="linux---generic-installer">Linux - Generic Installer</h3>
+<p>Open a terminal window and follow the steps below to install
+STM32CubeIDE on a generic linux machine.</p>
+<p>Download the STM32CubeIDE <a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/6c/ed/b5/05/5d/2f/44/f3/stm32cubeide_lnx/files/st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.sh.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.sh.zip">linux
+generic installer package</a>:</p>
+<pre><code>wget &lt;URL&gt;</code></pre>
+<p>Extract the package</p>
+<pre><code>unzip en.st-stm32cubeide*amd64.sh.zip</code></pre>
+<p>Add execute permissions to the install package</p>
+<pre><code>chmod +x st-stm32cubeide_*amd64.sh</code></pre>
+<p>Start the installation script and follow the prompts on the command
+line.</p>
+<pre><code>./st-stm32cubeide_1.9.0_12015_20220302_0855_amd64.sh</code></pre>
+<h3 id="mac-os-1">Mac OS</h3>
+<ol type="1">
+<li>Download the <a
+href="https://www.st.com/content/ccc/resource/technical/software/sw_development_suite/group0/05/31/11/3e/76/1d/40/01/stm32cubeide_mac/files/st-stm32cubeide_1.9.0_12015_20220302_0855_x86_64.dmg.zip/jcr:content/translations/en.st-stm32cubeide_1.9.0_12015_20220302_0855_x86_64.dmg.zip">STM32CubeIDE
+Mac package file</a>:</li>
+</ol>
+<pre><code>wget &lt;URL&gt;</code></pre>
+<ol start="2" type="1">
+<li>Unzip the package:</li>
+</ol>
+<pre><code>unzip st-stm32cubeide*.dmg.zip</code></pre>
+<ol start="3" type="1">
+<li><p>Mount the resulting dmg disk image by double clicking on
+it.</p></li>
+<li><p>Install the ST-link and/ or J-link debug tools.</p></li>
+<li><p>Copy the STM32CubeIDE package to your /Applications
+directory.</p></li>
+<li><p>Some releases of the STM32CubeIDE MacOS application is not
+properly signed and notarized, so the following command must be run
+after copying the .app to /Applications.</p></li>
+</ol>
+<pre><code>xattr -c /Applications/STM32CubeIDE.app</code></pre>
+<ol start="6" type="1">
+<li>Finally, open STM32CubeIDE from the Applications directory.</li>
+</ol>
+<h2 id="step-6-import-projects-into-stm32cubeide">Step 6: Import
+Projects into STM32CubeIDE</h2>
+<ol type="1">
+<li>Open STM32CubeIDE.</li>
+<li>When asked to open a workspace directory, select the location in
+which you cloned this git repository.</li>
+</ol>
+<blockquote>
+<p>Note: If you are not asked to select a workspace when STM32CubeIDE
+start, you may access this dialog via the <strong><em>File -&gt; Switch
+Workspace -&gt; Other</em></strong> menu item. 3. Select
+<strong><em>File -&gt; Import</em></strong>. 4. Select
+<strong><em>General -&gt; Existing Projects Into Workspace</em></strong>
+in the <strong><em>Select an Import Wizard</em></strong> dialog and
+click <strong>Next &gt;</strong>. 5. Click <strong>Browse</strong> next
+to the <em>Select root directory</em> box and navigate to the root of
+this repository. 6. Click the check box next to both the
+<em>b_u585i_iot02a_ntz</em> and <em>b_u585i_iot02a_tfm</em> projects and
+then click <strong>Finish</strong>. Note: Ensure that <em>copy projects
+into workspace</em> is not selected</p>
+</blockquote>
+<h2
+id="step-7-build-firmware-image-and-flash-your-development-board">Step
+7: Build Firmware image and Flash your development board</h2>
+<p>After importing the two demo projects into STM32CubeIDE, decide which
+one you will build and deploy first and follow the instructions below to
+do so.</p>
+<h3 id="building">Building</h3>
+<p>In the <strong>Project Explorer</strong> pane of STM32CubeIDE, Double
+click on the project to open it.</p>
+<p>Next, Right-click on the project in the <strong>Project
+Explorer</strong> pane and select <strong>Build Project</strong></p>
+<blockquote>
+<p>Note: You may also build the current project using the
+<strong>Project</strong>-&gt;<strong>Build Project</strong> menu
+item.</p>
+</blockquote>
+<h3 id="non-trustzone-project">Non-TrustZone Project</h3>
+<p>Review the README.md file for the <a
+href="Projects/b_u585i_iot02a_ntz">Non TrustZone</a> project for more
+information on the setup and limitations of this demo project.</p>
+<p>To flash the b_u585i_iot02a_ntz project to your STM32U5 IoT Discovery
+Kit, select the <em>Flash_ntz</em> configuration from the <strong>Run
+Configurations</strong> menu.</p>
+<h3 id="trustzone-tf-m-enabled-project">TrustZone / TF-M Enabled
+Project</h3>
+<p>Review the README.md file for the <a
+href="Projects/b_u585i_iot02a_tfm">TrustZone Enabled</a> project for
+more information on the setup and limitations of this demo project.</p>
+<p>To flash the b_u585i_iot02a_tfm project to your STM32U5 IoT Discovery
+Kit, select the <em>Flash_tfm_bl2_s_ns</em> configuration from the
+<strong>Run Configurations</strong> menu.</p>
+<h2 id="step-8-provision-your-board">Step 8: Provision Your Board</h2>
+<h3 id="option-8a-provision-automatically-with-provision.py">Option 8A:
+Provision automatically with provision.py</h3>
+<p>The simplest way to provision your board is to run the
+tools/provision.py script.</p>
+<p>After sourcing the tools/env_setup.sh script, run the folloing
+command: &gt; Note: When running interactive python scripts in GitBash
+on Microsoft Windows, you must add “winpty” to the beginning of the
+command you wish to run.</p>
+<pre><code>% python tools/provision.py --interactive
+Target device path: /dev/cu.usbmodem143303
+Connecting to target...
+[ INFO ] Found credentials in shared credentials file: ~/.aws/credentials (credentials.py:load)
+Interactive configuration mode: Press return to use defaults (displayed in brackets)
+time_hwm[1651013601]: &lt;return&gt;
+mqtt_port[8883]: &lt;return&gt;
+wifi_ssid[]: my_ssid&lt;return&gt;
+wifi_credential[]: password&lt;return&gt;
+mqtt_endpoint[xxxxxxxxxxxxxx-ats.iot.us-west-2.amazonaws.com]: &lt;return&gt;
+thing_name[xxxxxxxxxxxxxxxx]: &lt;return&gt;
+Commiting target configuration...
+Generating a new public/private key pair
+Generating a self-signed Certificate
+Attaching thing: xxxxxxxxxxxxxxxx to principal: arn:aws:iot:us-west-2:XXXXXXXXXXXXXX:cert/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Attaching the &quot;AllowAllDev&quot; policy to the device certificate.
+Importing root ca certificate: &quot;Starfield Services Root Certificate Authority - G2&quot;
+Provisioning process complete. Resetting target device...</code></pre>
+<h4 id="commandline-options">Commandline Options</h4>
+<p>The provision.py script has a variety of command line options that
+may be used to modify it’s behavior.</p>
+<p>The <em>–verbose</em> option is particularly useful for
+debugging.</p>
+<p>The <em>–cert-issuer</em> option may be set to either <em>self</em>
+to generate a self-signed certificate on the device or <em>aws</em> to
+generate a Certificate Signing Request and issue the cert using the AWS
+IoT CreateCertificateFromCsr API.</p>
+<pre><code>usage: provision.py [-h] [-i] [-v] [-d DEVICE] [--wifi-ssid WIFI_SSID] [--wifi-credential WIFI_CREDENTIAL] [--thing-name THING_NAME]
+                    [--cert-issuer {self,aws}] [--aws-profile AWS_PROFILE] [--aws-region AWS_REGION] [--aws-access-key-id AWS_ACCESS_KEY_ID]
+                    [--aws-access-key-secret AWS_ACCESS_KEY_SECRET]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i, --interactive
+  -v, --verbose
+  -d DEVICE, --device DEVICE
+  --wifi-ssid WIFI_SSID
+  --wifi-credential WIFI_CREDENTIAL
+  --thing-name THING_NAME
+  --cert-issuer {self,aws}
+  --aws-profile AWS_PROFILE
+  --aws-region AWS_REGION
+  --aws-access-key-id AWS_ACCESS_KEY_ID
+  --aws-access-key-secret AWS_ACCESS_KEY_SECRET</code></pre>
+<h3 id="option-8b-provision-manually-via-cli">Option 8B: Provision
+manually via CLI</h3>
+<p>Open the target board’s serial port with your favorite serial
+terminal. Some common options are terraterm, putty, screen, minicom, and
+picocom. Additionally a serial terminal is included in the pyserial
+package installed in the workspace python environment.</p>
+<p>To use the pyserial utility, run the following command to
+interactively list available serial devices: &gt; Note: When running
+interactive python scripts in GitBash, you must prepend “winpty” to the
+command you wish to run.</p>
+<pre><code>% source tools/env_setup.sh
+% python -m serial - 115200
+
+--- Available ports:
+---  1: /dev/cu.Bluetooth-Incoming-Port &#39;n/a&#39;
+---  2: /dev/cu.usbmodem143303 &#39;STLINK-V3 - ST-Link VCP Data&#39;
+--- Enter port index or full name: 2&lt;return&gt;
+--- Miniterm on /dev/cu.usbmodem143303  115200,8,N,1 ---
+--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---</code></pre>
+<p>And select your b_u585i_iot02a board from the list by number or port
+name.</p>
+<h4 id="thing-name">Thing Name</h4>
+<p>First, configure the desired thing name / mqtt device identifier:</p>
+<pre><code>&gt; conf set thing_name my_thing_name
+thing_name=&quot;my_thing_name&quot;</code></pre>
+<h4 id="wifi-ssid-and-passphrase">WiFi SSID and Passphrase</h4>
+<p>Next, configure you WiFi network details:</p>
+<pre><code>&gt; conf set wifi_ssid ssidGoesHere
+wifi_ssid=&quot;ssidGoesHere&quot;
+&gt; conf set wifi_credential MyWifiPassword
+wifi_credential=&quot;MyWifiPassword&quot;</code></pre>
+<h4 id="mqtt-endpoint">MQTT Endpoint</h4>
+<p>Next, set the mqtt endpoint to the endpoint for your account:</p>
+<pre><code>&gt; conf set mqtt_endpoint xxxxxxxxxxxxxx-ats.iot.us-west-2.amazonaws.com
+mqtt_endpoint=&quot;xxxxxxxxxxxxxx-ats.iot.us-west-2.amazonaws.com&quot;</code></pre>
+<blockquote>
+<p>Note: You can determine the endpoint for your AWS account with the
+<code>aws iot describe-endpoint</code> command or on the
+<em>Settings</em> page of the AWS IoT Core console.</p>
+</blockquote>
+<h4 id="commit-configuration-changes">Commit Configuration Changes</h4>
+<p>Finally, commit the staged configuration changes to non-volatile
+memory.</p>
+<pre><code>&gt; conf commit
+Configuration saved to NVM.</code></pre>
+<h4 id="generate-a-private-key">Generate a private key</h4>
+<p>Use the <em>pki generate key</em> command to generate a new ECDSA
+device key pair. The resulting public key will be printed to the
+console.</p>
+<pre><code>&gt; pki generate key
+SUCCESS: Key pair generated and stored in
+Private Key Label: tls_key_priv
+Public Key Label: tls_key_pub
+-----BEGIN PUBLIC KEY-----
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX=
+-----END PUBLIC KEY-----</code></pre>
+<h4 id="generate-a-self-signed-certificate">Generate a self-signed
+certificate</h4>
+<p>Next, use the <em>pki generate cert</em> command to generate a new
+self-signed certificate:</p>
+<pre><code>&gt; pki generate cert
+-----BEGIN CERTIFICATE-----
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX==
+-----END CERTIFICATE-----</code></pre>
+<p>Save the resulting certificate to a new file.</p>
+<h4 id="reset-the-target-device">Reset the target device</h4>
+<pre><code>&gt; reset
+Resetting device.</code></pre>
+<h3 id="register-the-device-with-aws-iot-core">Register the device with
+AWS IoT Core:</h3>
+<h4 id="register-the-certificate">Register the certificate</h4>
+<p>Follow the instructions at the AWS IoT Core Developer Guide to <a
+href="https://docs.aws.amazon.com/iot/latest/developerguide/manual-cert-registration.html#manual-cert-registration-noca-cli">register
+a client certificate</a>.</p>
+<pre><code>aws iot register-certificate-without-ca \
+    --status ACTIVE \
+    --certificate-pem file://device_cert_filename.pem</code></pre>
+<h4 id="register-the-thing-name">Register the Thing Name</h4>
+<pre><code>aws iot create-thing \
+    --thing-name SampleIoTThing</code></pre>
+<h4 id="attach-the-certificate-to-the-thing">Attach the Certificate to
+the thing</h4>
+<pre><code>aws iot attach-thing-principal \
+    --principal certificateArn \
+    --thing-name thingName</code></pre>
+<h4 id="register-a-policy-if-none-exists">Register a policy if none
+exists:</h4>
+<pre><code>aws iot create-policy \
+    --policy-name=&quot;AllowAllDev&quot; \
+    --policy-document=&quot;{ \&quot;Version\&quot;: \&quot;2012-10-17\&quot;, \&quot;Statement\&quot;: [{\&quot;Effect\&quot;: \&quot;Allow\&quot;, \&quot;Action\&quot;: \&quot;iot:*\&quot;, \&quot;Resource\&quot;: \&quot;*\&quot;}]}&quot;</code></pre>
+<blockquote>
+<p>Note: This policy allows very broad access to AWS IoT MQTT APIs. Use
+a more restrictive policy for any production environments.</p>
+</blockquote>
+<h4 id="attach-a-security-policy">Attach a security policy</h4>
+<pre><code>aws iot attach-policy \
+    --target certificateArn \
+    --policy-name AllowAllDev</code></pre>
+<h1 id="observe-mqtt-messages-on-the-aws-iot-core-console.">Observe MQTT
+messages on the AWS IoT Core Console.</h1>
+<p>Log in to <a href="aws.amazon.com">aws.amazon.com</a> with the IAM
+User created earlier in this guide.</p>
+<p>Navigate to the <strong>Iot Core</strong> service using the search
+box at the top of the page.</p>
+<p>Using the menu on the left side of the screen, select
+<strong>Test</strong>-&gt;<strong>MQTT test client</strong></p>
+<p>Set the topic filter to <em>#</em> and click the <em>Subscribe</em>
+button.</p>
+<p><img width="500" alt="23" src="https://user-images.githubusercontent.com/44592967/153659120-264158f3-3cc1-4062-9094-c6c5d469d130.PNG"></p>
+<p>You will soon see sensor data streaming from your test device. &gt;
+Note: You may need to reset the board using the black <em>RST</em>
+button.</p>
+<p><img width="271" alt="24" src="https://user-images.githubusercontent.com/44592967/153659267-9de9ac07-bd3b-4899-a7ce-044aa3ba678a.PNG"></p>
+<h1 id="setting-up-freertos-ota">Setting up FreeRTOS OTA</h1>
+<h2 id="generate-a-code-signing-key">Generate a Code Signing key</h2>
+<p>Devices uses digital signatures to verify the authenticity of the
+firmware updates sent over the air. Images are signed by an authorized
+source who creats the image, and device can verify the signature of the
+image, using the corresponding public key of the source. Steps below
+shows how to setup and provision the code signing credentials so as to
+enable cloud to digitally sign the image and the device to verify the
+image signature before boot.</p>
+<ol type="1">
+<li>In your working directory, use the following text to create a file
+named <em>cert_config.txt</em>. Replace <em>test_signer@amazon.com</em>
+with your email address:</li>
+</ol>
+<pre><code>[ req ]
+prompt             = no
+distinguished_name = my_dn
+
+[ my_dn ]
+commonName = test_signer@amazon.com
+
+[ my_exts ]
+keyUsage         = digitalSignature
+extendedKeyUsage = codeSigning</code></pre>
+<ol start="2" type="1">
+<li>Create an ECDSA code-signing private key:</li>
+</ol>
+<pre><code>openssl genpkey -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve -outform PEM -out ecdsasigner-priv-key.pem</code></pre>
+<ol start="3" type="1">
+<li>Generate the corresponding public key from the private key:</li>
+</ol>
+<pre><code>openssl ec -inform pem -in ecdsasigner-priv-key.pem -pubout -outform pem -out ecdsasigner-pub-key.pem</code></pre>
+<ol start="4" type="1">
+<li>Create an ECDSA code-signing certificate to be uploaded to the AWS
+ACM service:</li>
+</ol>
+<pre><code>openssl req -new -x509 -config cert_config.txt -extensions my_exts -nodes -days 365 -key ecdsasigner-priv-key.pem -out ecdsasigner.crt
+</code></pre>
+<ol start="5" type="1">
+<li>Import the code-signing certificate and private key into AWS
+Certificate Manager:</li>
+</ol>
+<blockquote>
+<p>Note: This command displays an ARN for your certificate. You will
+need this ARN when you create an OTA update job later.</p>
+</blockquote>
+<pre><code>aws acm import-certificate --certificate fileb://ecdsasigner.crt --private-key fileb://ecdsasigner-priv-key.pem</code></pre>
+<ol start="6" type="1">
+<li>Connect to the target device via a serial terminal. On the command
+line prompt type following command to import the OTA signing key:</li>
+</ol>
+<pre><code>&gt; pki import key ota_signer_pub
+# Press `Enter` then paste the contents of the PEM public key file `ecdsasigner-pub-key.pem` into the terminal.
+# Press `Enter` again.</code></pre>
+<blockquote>
+<p>Note: <code>ota_signer_pub</code> is the label used to refer to the
+code signing key during verification of the firmware update.</p>
+</blockquote>
+<ol start="7" type="1">
+<li>Create a signing profile in AWS to sign the firmware image.</li>
+</ol>
+<pre><code>aws signer put-signing-profile --profile-name &lt;your profile name&gt; --signing-material certificateArn=&lt;certificate arn created in step 4&gt; --platform AmazonFreeRTOS-Default --signing-parameters certname=ota_signer_pub</code></pre>
+<h2 id="setup-ota-s3-bucket-service-role-and-policies-in-aws">Setup OTA
+S3 bucket, Service role and policies in AWS</h2>
+<ol type="1">
+<li><p>S3 bucket is used to store the new firmware image to be updated.
+To create a new S3 bucket follow these steps here:
+https://docs.aws.amazon.com/freertos/latest/userguide/dg-ota-bucket.html</p></li>
+<li><p>Create a service role which grants permission for OTA service to
+access the firmware image:
+https://docs.aws.amazon.com/freertos/latest/userguide/create-service-role.html</p></li>
+<li><p>Create an OTA update policy using the documentatio here:
+https://docs.aws.amazon.com/freertos/latest/userguide/create-ota-user-policy.html</p></li>
+<li><p>Add a policy for AWS IoT to access the code signing profile:
+https://docs.aws.amazon.com/freertos/latest/userguide/code-sign-policy.html</p></li>
+</ol>
+<h2 id="create-a-code-signed-firmware-update-job">Create a code signed
+firmware update job</h2>
+<ol type="1">
+<li><p>Bump up the version of the new firmware image to be updated. From
+the demo project, open File
+<code>Src/ota_pal/ota_firmware_version.c</code> and set
+APP_VERSION_MAJOR to 1 higher than current version. Build the firmware
+image using STM32Cube IDE.</p></li>
+<li><p>Upload the new image to the s3 bucket created in the previous
+section.</p></li>
+</ol>
+<pre><code>aws s3 cp &lt;image binary path&gt; s3://&lt;s3 bucket for image&gt;/
+</code></pre>
+<p>Get the latest s3 file version of the binary image by executing the
+command below. The command returns an array of json structs containing
+details of all version. To get the latest version ID, look for
+<em>VersionId</em> field in the json struct where <em>isLatest</em>
+field is <em>true</em>.</p>
+<pre><code>aws s3api  list-object-versions --bucket &lt;s3 bucket for image&gt; --prefix &lt;image binary name&gt;</code></pre>
+<ol start="3" type="1">
+<li>Create a new OTA Update job configuration json file (Example:
+ota-update-job-config.json) in your filesystem as below. Substitue the
+parameters with the output obtained from steps above.</li>
+</ol>
+<pre><code>{
+     &quot;otaUpdateId&quot;: &quot;&lt;A unique job ID for the OTA job&gt;&quot;,
+     &quot;targets&quot;: [
+         &quot;arn:aws:iot:&lt;region&gt;:&lt;account id&gt;:thing/&lt;thing name&gt;&quot;
+     ],
+     &quot;targetSelection&quot;: &quot;SNAPSHOT&quot;,
+     &quot;files&quot;: [{
+         &quot;fileName&quot;: &quot;&lt;image binary name&gt;&quot;,
+         &quot;fileVersion&quot;: &quot;1&quot;,
+         &quot;fileLocation&quot;: {
+             &quot;s3Location&quot;: {
+                 &quot;bucket&quot;: &quot;&lt;s3 image bucket created above&gt;&quot;,
+                 &quot;key&quot;: &quot;&lt;image binary name&gt;&quot;,
+                 &quot;version&quot;: &quot;&lt;latest s3 file version of binary image&gt;&quot;
+             }
+         },
+         &quot;codeSigning&quot;: {
+             &quot;startSigningJobParameter&quot;: {
+                 &quot;signingProfileName&quot;: &quot;&lt;signing profile name&gt;&quot;,
+                 &quot;destination&quot;: {
+                     &quot;s3Destination&quot;: {
+                         &quot;bucket&quot;: &quot;&lt;s3 image bucket created above&gt;&quot;
+                     }
+                 }
+             }
+         }
+     }],
+     &quot;roleArn&quot;: &quot;&lt;ARN of the OTA service role created above&gt;&quot;
+ }
+</code></pre>
+<p>Create a new OTA update job from the configuration file:</p>
+<pre><code>aws iot create-ota-update --cli-input-json file://&lt;ota job configuration file path in your filesystem&gt;</code></pre>
+<p>The command on success returns the OTA Update identifier and status
+of the Job as <code>CREATE_PENDING</code>. To get the corresponding job
+ID of the OTA Job, execute the following command and look for
+<code>awsIotJobId</code> field in json document returned.</p>
+<pre><code>aws iot get-ota-update --ota-update-id=&lt;ota update id created above&gt;</code></pre>
+<p>Note down the job ID to check the status of the job later.</p>
+<h4 id="monitoring-and-verification-of-firmware-update">Monitoring and
+Verification of firmware update</h4>
+<p>Once the job is created on the terminal logs, you will see that OTA
+job is accepted and device starts downloading image.</p>
+<p>Create a new OTA update job from the configuration file:</p>
+<pre><code>aws iot create-ota-update --cli-input-json file://&lt;ota job configuration file path in your filesystem&gt;</code></pre>
+<p>The command on success returns the OTA Update identifier and status
+of the Job as <em>CREATE_PENDING</em>. To get the corresponding job ID
+of the OTA Job, execute the following command and look for
+<em>awsIotJobId</em> field in json document returned.</p>
+<pre><code>aws iot get-ota-update --ota-update-id=&lt;ota update id created above&gt;</code></pre>
+<p>Note down the job ID to check the status of the job later.</p>
+<h2 id="monitoring-and-verification-of-firmware-update-1">Monitoring and
+Verification of firmware update</h2>
+<ol type="1">
+<li>Once the job is created on the terminal logs, you will see that OTA
+job is accepted and device starts downloading image.</li>
+</ol>
+<pre><code>&lt;INF&gt;    16351 [OTAAgent] Current State=[WaitingForFileBlock], Event=[RequestFileBlock], New state=[WaitingForFileBlock] (ota.c:2834)
+&lt;INF&gt;    15293 [OTAAgent] Extracted parameter: [key: value]=[execution.jobDocument.afr_ota.streamname: AFR_OTA-eb53bc47-6918-4b2c-9c85-a4c74c44a04c] (ota.c:1642)
+&lt;INF&gt;    15294 [OTAAgent] Extracted parameter: [key: value]=[execution.jobDocument.afr_ota.protocols: [&quot;MQTT&quot;]] (ota.c:1642)
+&lt;INF&gt;    15296 [OTAAgent] Extracted parameter: [key: value]=[filepath: b_u585i_iot02a_ntz.bin] (ota.c:1642)
+&lt;INF&gt;    17784 [OTAAgent] Current State=[WaitingForFileBlock], Event=[RequestFileBlock], New state=[WaitingForFileBlock] (ota.c:2834)
+&lt;INF&gt;    15297 [OTAAgent] Extracted parameter: [key: value]=[fileid: 0] (ota.c:1683)
+&lt;INF&gt;    15298 [OTAAgent] Extracted parameter: [key: value]=[certfile: ota_signer_pub] (ota.c:1642)
+&lt;INF&gt;    15300 [OTAAgent] Extracted parameter [ sig-sha256-ecdsa: MEUCIGWRkFqcumdPZhoZ93ov5Npvsjj7... ] (ota.c:1573)
+&lt;INF&gt;    15301 [OTAAgent] Extracted parameter: [key: value]=[fileType: 0] (ota.c:1683)
+&lt;INF&gt;    15301 [OTAAgent] Job document was accepted. Attempting to begin the update. (ota.c:2199)
+&lt;INF&gt;    16533 [OTAAgent] Number of blocks remaining: 306 (ota.c:2683)
+&lt;INF&gt;    15450 [OTAAgent] Setting OTA data interface. (ota.c:938)
+&lt;INF&gt;    15450 [OTAAgent] Current State=[Creating
+</code></pre>
+<ol start="2" type="1">
+<li>Once the full image has been downloaded, the OTA library verifies
+the image signature and activates the new image in the unused flash
+bank.</li>
+</ol>
+<pre><code>&lt;INF&gt;    67405 [OTAAgent] Received final block of the update. (ota.c:2633)
+&lt;INF&gt;    67405 [OTAAgent] Validating the integrity of OTA image using digital signature. (ota_pal.c:681)
+&lt;INF&gt;    69643 [OTAAgent] Received entire update and validated the signature. (ota.c:2654)</code></pre>
+<ol start="3" type="1">
+<li>New image boots up and performs a self test, here it checks the
+version is higher than previous. If so it sets the new image as
+valid.</li>
+</ol>
+<pre><code>&lt;INF&gt;    15487 [OTAAgent] In self test mode. (ota.c:2102)
+&lt;INF&gt;    15487 [OTAAgent] New image has a higher version number than the current image: New image version=1.9.0, Previous image version=0.9.0 (ota.c:1932)</code></pre>
+<ol start="4" type="1">
+<li>Checking the job status, should show the job as succeeded:</li>
+</ol>
+<pre><code>aws iot describe-job-execution --job-id=&lt;Job ID created above&gt; --thing-name=&lt;thing name&gt;</code></pre>
+</body>
+</html>

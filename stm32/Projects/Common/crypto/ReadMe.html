@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ReadMe</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../../../_htmresc/mini-st_2020_raw.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h3 id="pkiobject-api">PkiObject API</h3>
+<p>The PkiObject API takes care of some of the mundane tasks in
+converting between different representations of cryptographic objects
+such as public keys, private keys, and certificates.</p>
+<p>Files located in this folder belong to the PkiObject module.</p>
+<p>This API can be accessed via the <code>pki</code> CLI command which
+is implemented in the <code>Common/cli/cli_pki.c</code> file.</p>
+<pre><code>pki:
+    Perform public/private key operations.
+    Usage:
+    pki &lt;verb&gt; &lt;object&gt; &lt;args&gt;
+        Valid verbs are { generate, import, export, list }
+        Valid object types are { key, csr, cert }
+        Arguments should be specified in --&lt;arg_name&gt; &lt;value&gt;
+
+    pki generate key &lt;label_public&gt; &lt;label_private&gt; &lt;algorithm&gt; &lt;algorithm_param&gt;
+        Generates a new private key to be stored in the specified labels
+
+    pki generate csr &lt;label&gt;
+        Generates a new Certificate Signing Request using the private key
+        with the specified label.
+        If no label is specified, the default tls private key is used.
+
+    pki generate cert &lt;cert_label&gt; &lt;private_key_label&gt;
+        Generate a new self-signed certificate
+
+    pki import cert &lt;label&gt;
+        Import a certificate into the given slot. The certificate should be
+        copied into the terminal in PEM format, ending with two blank lines.
+
+    pki export cert &lt;label&gt;
+        Export the certificate with the given label in pem format.
+        When no label is specified, the default certificate is exported.
+
+    pki import key &lt;label&gt;
+        Import a public key into the given slot. The key should be
+        copied into the terminal in PEM format, ending with two blank lines.
+
+    pki export key &lt;label&gt;
+        Export the public portion of the key with the specified label.</code></pre>
+</body>
+</html>

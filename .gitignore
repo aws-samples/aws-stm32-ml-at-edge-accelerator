@@ -1,0 +1,25 @@
+*.js
+!jest.config.js
+*.d.ts
+node_modules
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+
+.DS_Store
+
+__pycache__/
+.venv
+.cache
+
+stm32/.metadata
+
+stm32/Projects/b_u585i_iot02a_ntz/Debug
+
+stm32/Projects/Common/X-CUBE-AI/App/network*
+
+stm32/Middleware/STM32_AI_Library/*
+
+stm32/Projects/Common/dpu/ai_model_config.h
+stm32/Projects/Common/dpu/user_mel_tables.*
