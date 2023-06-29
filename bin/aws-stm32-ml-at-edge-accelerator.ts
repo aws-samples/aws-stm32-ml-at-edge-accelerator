@@ -5,7 +5,7 @@
 
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CicdStack } from '../lib/cicd-stack';
+import { PipelineStack } from '../lib/pipeline-stack';
 import { CfnGuardValidator } from '@cdklabs/cdk-validator-cfnguard';
 
 const app = new cdk.App({
@@ -22,7 +22,7 @@ const app = new cdk.App({
   ],
 });
 const config = app.node.tryGetContext('config');
-new CicdStack(app, 'CicdStack', {
+new PipelineStack(app, 'AcceleratorPipelineStack', {
   env: config.envs.cicd,
   description: 'AWS STM32 ML at Edge Accelerator (uksb-1tupboc18)',
 });
