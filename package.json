@@ -1,8 +1,8 @@
 {
-  "name": "stmicro-ml-accelerator",
+  "name": "aws-stm32-ml-at-edge-accelerator",
   "version": "0.1.0",
   "bin": {
-    "stmicro-ml-accelerator": "bin/stmicro-ml-accelerator.js"
+    "aws-stm32-ml-at-edge-accelerator": "bin/aws-stm32-ml-at-edge-accelerator.js"
   },
   "scripts": {
     "deploy": "cdk deploy CicdStack",
