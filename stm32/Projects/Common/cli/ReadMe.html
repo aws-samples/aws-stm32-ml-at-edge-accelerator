@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ReadMe</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="../../../_htmresc/mini-st_2020_raw.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h3 id="command-line-interface-cli">Command Line Interface (CLI)</h3>
+<p>The CLI interface is used to provision the device. There is a python
+script to automatically provision the device and register Thing into
+cloud. See <a href="../../../Getting_Started_Guide.md">Getting Started
+Guide</a></p>
+<h3 id="other-unix-like-utilities">Other Unix-like utilities</h3>
+<p>The following other utilities are also available in this image:</p>
+<pre><code>ps
+    List the status of all running tasks and related runtime statistics.
+
+kill
+    kill [ -SIGNAME ] &lt;Task ID&gt;
+        Signal a task with the named signal and the specified task id.
+
+    kill [ -n ] &lt;Task ID&gt;
+        Signal a task with the given signal number and the specified task id.
+
+killall
+    killall [ -SIGNAME ] &lt;Task Name&gt;
+    killall [ -n ] &lt;Task Name&gt;
+        Signal a task with a given name with the signal number or signal name given.
+
+heapstat
+    heapstat [-b | --byte]
+        Display heap statistics in bytes.
+
+    heapstat -h | -k | --kibi
+        Display heap statistics in Kibibytes (KiB).
+
+    heapstat -m | --mebi
+        Display heap statistics in Mebibytes (MiB).
+
+    heapstat --kilo
+        Display heap statistics in Kilobytes (KB).
+
+    heapstat --mega
+        Display heap statistics in Megabytes (MB).
+
+reset
+    Reset (reboot) the system.
+
+uptime
+    Display system uptime.
+
+rngtest &lt;number of bytes&gt;
+    Read the specified number of bytes from the rng and output them base64 encoded.
+
+assert
+   Cause a failed assertion.</code></pre>
+</body>
+</html>

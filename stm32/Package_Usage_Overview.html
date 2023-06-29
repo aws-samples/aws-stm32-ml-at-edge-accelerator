@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Package_Usage_Overview</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <link rel="stylesheet" href="_htmresc/mini-st_2020_raw.css" />
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<h1 id="overview-of-the-package-usage">Overview of the package
+usage</h1>
+<p>The dark background activity boxes are required steps.</p>
+<p>The white background activity boxes are optional, intended for
+over-the-air (OTA) firmware update.</p>
+<figure>
+<img src="_htmresc/B-U585I-IOT02A-Usage.svg" alt=" " />
+<figcaption aria-hidden="true"> </figcaption>
+</figure>
+<p>For the user convenience and a slightly quicker evaluation of the
+application (without OTA firmware update, though), pre-build binary
+files are provided in
+<code>Projects/b_u585i_iot02a_*/Binary/</code>:</p>
+<ul>
+<li>The No-TrustZone application may be directly copied to the
+<code>NOD_U585AI</code> USB drive which is detected by the user computer
+when the device is connected to it over USB.</li>
+<li>The TF-M application may be flashed after
+<em>STM32CubeProgrammer</em> is installed and added to the user
+environment <code>PATH</code> variable by running from a bash
+shell:</li>
+</ul>
+<pre><code>$ cd Projects/b_u585i_iot02a_tfm/Binary
+$ ./prog.sh RM
+$ ./prog.sh REG
+$ ./prog.sh FULL</code></pre>
+<p>The <code>prog.sh</code> script takes care of resetting the MCU
+security configuration before programming the firmware, which combines
+the secure bootloader, the secure TF-M partition, and the non-secure
+user application.</p>
+<p>This results in the following flow, where the green strikethrough
+elements may be skipped: <img
+src="_htmresc/B-U585I-IOT02A-QuickUsage.svg" alt=" " /></p>
+</body>
+</html>

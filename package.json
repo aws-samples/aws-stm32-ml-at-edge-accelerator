@@ -1,0 +1,35 @@
+{
+  "name": "stmicro-ml-accelerator",
+  "version": "0.1.0",
+  "bin": {
+    "stmicro-ml-accelerator": "bin/stmicro-ml-accelerator.js"
+  },
+  "scripts": {
+    "deploy": "cdk deploy CicdStack",
+    "destroy": "cdk destroy CicdStack",
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.115",
+    "@types/jest": "^29.4.0",
+    "@types/node": "18.14.6",
+    "aws-cdk": "2.83.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.0.5",
+    "ts-node": "^10.9.1",
+    "typescript": "~4.9.5"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-lambda-python-alpha": "2.83.0-alpha.0",
+    "@cdklabs/cdk-validator-cfnguard": "^0.0.40",
+    "aws-cdk-lib": "2.83.0",
+    "aws-lambda": "^1.0.7",
+    "aws-sdk": "^2.1377.0",
+    "constructs": "^10.0.0",
+    "esbuild": "^0.17.19",
+    "source-map-support": "^0.5.21"
+  }
+}
