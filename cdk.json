@@ -1,22 +1,32 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/stmicro-ml-accelerator.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/aws-stm32-ml-at-edge-accelerator.ts",
   "watch": {
     "include": ["**"],
-    "exclude": ["README.md", "cdk*.json", "**/*.d.ts", "**/*.js", "tsconfig.json", "package*.json", "yarn.lock", "node_modules", "test"]
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "**/*.d.ts",
+      "**/*.js",
+      "tsconfig.json",
+      "package*.json",
+      "yarn.lock",
+      "node_modules",
+      "test"
+    ]
   },
   "context": {
     "config": {
       "envs": {
-        "cicd": { "account": "996005995793", "region": "eu-west-1" },
-        "ml": { "account": "006372829946", "region": "eu-west-1" },
-        "iot": [{ "name": "dev", "account": "797075967427", "region": "eu-west-1" }]
+        "cicd": { "account": "<Account>", "region": "<Region>" },
+        "ml": { "account": "<Account>", "region": "<Account>" },
+        "iot": [{ "name": "dev", "account": "<Account>", "region": "<Account>" }]
       },
       "stUsernameSecret": "STDEVCLOUD_USERNAME_SECRET",
       "stPasswordSecret": "STDEVCLOUD_PASSWORD_SECRET",
       "repo": {
-        "name": "asenousy/stmicroml",
-        "branch": "main",
-        "connectionArn": "arn:aws:codestar-connections:eu-west-1:996005995793:connection/7e3d892a-5667-4359-a303-43b7dd90ef8b"
+        "name": "<Repo_Name>",
+        "branch": "<Branch_Name>",
+        "connectionArn": "<Connection_Arn>"
       }
     },
     "@aws-cdk/core:bootstrapQualifier": "stmicro",
