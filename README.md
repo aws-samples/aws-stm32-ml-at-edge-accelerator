@@ -32,16 +32,21 @@ The project is built using CDK IaC. So it can be deployed to your AWS account wi
 1. You need to set up a connection between the pipeline and your Repo
    1. Follow the steps to create & very the connection [here](https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html)
    1. Go to [cdk.json](./cdk.json) and paste your Repo name, branch & connection Arn in the config section.
-1. Finally in the root folder, run the following commands
+1. In the root folder, run the following commands
    ```
    npm install
+   npm run cdk synth
+   ```
+1. You will notice a `cdk.context.json` is created. Please commit this file along with your edited `cdk.json`. And push the commit to your forked repo.
+1. Once your repo has been updated with the `cdk.json` & the newly created `cdk.context.json`, we can finally deploy with
+   ```
    npm run deploy
    ```
 1. This is the only time you need to run commands locally, for any future changes just push new commits to your repo and the pipeline redeploy the new code changes.
 
 ### Setup the Device
 
-These steps assume you have the B-U585I-IOT02A
+These steps assume you have a [B-U585I-IOT02A](https://www.arrow.com/en/products/b-u585i-iot02a/stmicroelectronics) device
 
 #### Pre-requisites
 
