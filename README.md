@@ -15,13 +15,18 @@ The project is built using CDK IaC. So it can be deployed to your AWS account wi
 - Ensure your AWS credentials are in place for your Pipeline account (The account that will host the pipeline stack if different)
 - Ensure you have [Node.js](https://nodejs.org) and [Docker](https://www.docker.com/products/docker-desktop/) installed
 - Create an account in [STM32Cube.AI Developer Cloud](https://stm32ai-cs.st.com/home)
-- In your AWS Cloud that will host the ML Stack, go to secrets manager console page:
-  - Create a secret called STDEVCLOUD_USERNAME_SECRET and put the username as plain text
-  - Create a secret called STDEVCLOUD_PASSWORD_SECRET and put the password as plain text
-- Bootstrap your account:
-  run the following commands
+- In your AWS Account that will host the ML Stack (if different). Go to secrets manager console page:
+  1.  Create a new secret for your ST username
+      1.  Choose type other
+      1.  Choose Plaintext tab
+      1.  Overwrite content with you username
+      1.  Give this secret the following name `ST_DEVCLOUD_USERNAME_SECRET` (if you require a different name, then ensure to update this new name in `cdk.json`)
+  1.  Create a new secret for your ST password
+      1.  Repeat the previous step but with the following secret name `ST_DEVCLOUD_PASSWORD_SECRET`
+          run the following commands
+- Bootstrap your account (each account if more than one) with the following command replacing your account and region placeholders
   ```
-  npx cdk bootstrap aws://<ACCOUNT-NUMBER>/<REGION> -- --toolkit-stack-name CDKToolkit-StMicro --qualifier stmicro
+  npx cdk bootstrap aws://<ACCOUNT-NUMBER>/<REGION> --toolkit-stack-name CDKToolkit-StMicro --qualifier stmicro
   ```
 
 ### deploy the CICD Pipeline
@@ -29,9 +34,9 @@ The project is built using CDK IaC. So it can be deployed to your AWS account wi
 1. Fork this repo.
 1. Clone your fork locally.
 1. Go to [cdk.json](./cdk.json) and put your aws account details for each stack in the `env` field, you could deploy the stacks in the same account or in different accounts
-1. You need to set up a connection between the pipeline and your Repo
-   1. Follow the steps to create & very the connection [here](https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html)
-   1. Go to [cdk.json](./cdk.json) and paste your Repo name, branch & connection Arn in the config section.
+1. You need to set up a connection between the pipeline and your forked Repo
+   1. Follow the steps to create & verify the connection [here](https://docs.aws.amazon.com/dtconsole/latest/userguide/connections-create-github.html)
+   1. Go to [cdk.json](./cdk.json) and paste your forked Repo name, branch & connection Arn in the config section.
 1. In the root folder, run the following commands
    ```
    npm install
@@ -52,6 +57,9 @@ These steps assume you have a [B-U585I-IOT02A](https://www.arrow.com/en/products
 
 - Ensure your AWS credentials are in place for your IoT account (The account that will host the IoT stack if different)
 - Download and Install [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) to be able to flash device with initial firmware
+
+  **Note**
+  if installing on a Mac make sure you run the following command before installing to give it exec permission `sudo xattr -cr ~/SetupSTM32CubeProgrammer-macos.app`
 
 #### Provision Your Board
 
@@ -77,7 +85,19 @@ the script should look like below
 python tools/provision.py --interactive  --thing-name <Thing-Name>
 ```
 
-After you provision the device successfully. Go back to the output tab of the IotStack in cloudformation page. And copy the public key value. and follow below steps:
+After you provision the device successfully. Go back to the output tab of the IotStack in cloudformation page. And copy the public key value.
+
+**Warning**
+The displayed public key might not be properly formatted, please ensure you fix the format using any text editor to add the correct newlines as seen below before continuing
+
+```
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAECSEgXkzVQkq2fQwPjIhKIkvJBVCl
+VaRDhiyj9BGkHbuAnGzM0gC+z6oYpxbkgE3qa6fHJoE99QTwrRh8XWwyCg==
+-----END PUBLIC KEY-----
+```
+
+And follow below steps:
 
 1. connect to device using `screen /dev/tty.usbmodem103 115200`
 1. run this command `pki import key ota_signer_pub`
@@ -87,8 +107,19 @@ After you provision the device successfully. Go back to the output tab of the Io
 
 Before we can use over the air (OTA) firmware updates, we need to atlease flash the device with the firmware manually once. Then future changes will be handled by Freertos OTA updates.
 
-After CDK deployment is successfull a binary firmware should have been created in s3 bucket. You can find the name of the bucket in the cloudformation output tab for the iotStack.
-please download the the file and downloading and using [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) follow the [steps](https://wiki.stmicroelectronics.cn/stm32mpu/wiki/STM32CubeProgrammer#Flash_programming_principles) to flash the device with the firware.
+After deployment is successfull a binary firmware file should have been created in s3 bucket. You can find the name of the bucket in the same cloudformation output tab for the iotStack. The binary file will have the follwing name `b_u585i_iot02a_ntz.bin`, please download this file.
+If you have already installed [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html), follow these steps to flash the device with the firware.
+
+1. Connect your device to your computer
+1. Open STM32CubeProgrammer
+1. Click Connect button on top right to connect to device
+1. Go to Menu and choose `Erase & programming`
+1. Click Browse and choose our binary file we just downloaded from s3
+1. Click `Start Programming` to flash binary to device
+1. When finished click `Disconnect` on top right corner
+
+**Note**
+if installing on a Mac make sure you run the following command before installing to give it exec permission `sudo xattr -cr ~/SetupSTM32CubeProgrammer-macos.app`
 
 Once flashed if you are still connected to the device using the command `screen /dev/tty.usbmodem103 115200`, you should see the device starting to log sound class detected from sensors.
 
