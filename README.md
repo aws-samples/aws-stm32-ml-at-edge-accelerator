@@ -10,6 +10,9 @@ This is an AWS STM32 example project that implements MLOps infrastructure using 
 
 The project is built using CDK IaC. So it can be deployed to your AWS account with a single deploy command.
 
+**Note**
+This Project was only tested on region `eu-west-1`
+
 ### Pre-requisites
 
 - Ensure your AWS credentials are in place for your Pipeline account (The account that will host the pipeline stack if different)
