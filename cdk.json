@@ -18,11 +18,11 @@
     "config": {
       "envs": {
         "cicd": { "account": "<Account>", "region": "<Region>" },
-        "ml": { "account": "<Account>", "region": "<Account>" },
-        "iot": [{ "name": "dev", "account": "<Account>", "region": "<Account>" }]
+        "ml": { "account": "<Account>", "region": "<Region>" },
+        "iot": [{ "name": "dev", "account": "<Region>", "region": "<Region>" }]
       },
-      "stUsernameSecret": "STDEVCLOUD_USERNAME_SECRET",
-      "stPasswordSecret": "STDEVCLOUD_PASSWORD_SECRET",
+      "stUsernameSecret": "ST_DEVCLOUD_USERNAME_SECRET",
+      "stPasswordSecret": "ST_DEVCLOUD_PASSWORD_SECRET",
       "repo": {
         "name": "<Repo_Name>",
         "branch": "<Branch_Name>",
