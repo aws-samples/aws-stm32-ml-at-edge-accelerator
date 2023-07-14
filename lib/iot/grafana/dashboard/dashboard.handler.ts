@@ -1,6 +1,7 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: MIT-0
 
+import { SecretsManager } from 'aws-sdk';
 import {
   CdkCustomResourceHandler,
   CloudFormationCustomResourceUpdateEvent,
@@ -8,10 +9,17 @@ import {
 } from 'aws-lambda';
 import axios from 'axios';
 
+const secretsmanager = new SecretsManager();
+
 export const handler: CdkCustomResourceHandler = async (event) => {
   console.log(JSON.stringify(event));
   const { RequestType, ResourceProperties } = event;
-  const { endpoint, apiKey } = ResourceProperties;
+  const { endpoint, apiKeySecretName } = ResourceProperties;
+
+  const { SecretString: apiKey } = await secretsmanager
+    .getSecretValue({ SecretId: apiKeySecretName })
+    .promise();
+
   const url = 'https://' + endpoint;
   const configs = { headers: { Authorization: 'Bearer ' + apiKey } };
   const payload = JSON.parse(ResourceProperties.payload);

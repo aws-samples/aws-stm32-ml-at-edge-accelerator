@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import { aws_grafana, custom_resources, aws_iam } from 'aws-cdk-lib';
+import { aws_grafana, Duration, aws_iam, aws_secretsmanager, aws_lambda_nodejs } from 'aws-cdk-lib';
 import { TimeStreamDataSource } from './datasource/datasource';
 import { Dashboard } from './dashboard/dashboard';
 
@@ -16,7 +16,6 @@ export class Grafana extends Construct {
       assumedBy: new aws_iam.ServicePrincipal('grafana.amazonaws.com'),
       managedPolicies: [
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonTimestreamReadOnlyAccess'),
-        // aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AdministratorAccess'),
       ],
     });
 
@@ -28,33 +27,32 @@ export class Grafana extends Construct {
       roleArn: role.roleArn,
     });
 
-    const apiKeyCr = new custom_resources.AwsCustomResource(this, 'ApiKeyCr', {
-      onUpdate: {
-        service: 'Grafana',
-        action: 'createWorkspaceApiKey',
-        parameters: {
-          workspaceId: workspace.attrId,
-          keyName: 'key-' + Date.now(),
-          keyRole: 'ADMIN',
-          secondsToLive: 60 * 60,
-        },
-        physicalResourceId: custom_resources.PhysicalResourceId.of(Date.now().toString()),
-      },
-      policy: custom_resources.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: custom_resources.AwsCustomResourcePolicy.ANY_RESOURCE,
-      }),
+    const apiKeySecret = new aws_secretsmanager.Secret(this, 'ApiKeySecret', {});
+    apiKeySecret.node.addDependency(workspace);
+    const rotationFn = new aws_lambda_nodejs.NodejsFunction(this, 'key-rotation', {
+      environment: { SECRET_NAME: apiKeySecret.secretName, WORKSPACE_ID: workspace.attrId },
+    });
+    apiKeySecret.grantWrite(rotationFn);
+    rotationFn.role?.addManagedPolicy(
+      aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSGrafanaAccountAdministrator')
+    );
+
+    apiKeySecret.addRotationSchedule('RotationSchedule', {
+      rotationLambda: rotationFn,
+      automaticallyAfter: Duration.days(29),
+      rotateImmediatelyOnUpdate: true,
     });
 
     const datasource = new TimeStreamDataSource(this, 'TimeStreamDataSource', {
       endpoint: workspace.attrEndpoint,
-      apiKey: apiKeyCr.getResponseField('key'),
+      apiKeySecret: apiKeySecret,
       database: timestream.database,
       table: timestream.table,
     });
 
-    new Dashboard(this, 'Dashboard', {
+    const dashboard = new Dashboard(this, 'Dashboard', {
       endpoint: workspace.attrEndpoint,
-      apiKey: apiKeyCr.getResponseField('key'),
+      apiKeySecret: apiKeySecret,
       database: timestream.database,
       table: timestream.table,
       datasourceId: datasource.id,
