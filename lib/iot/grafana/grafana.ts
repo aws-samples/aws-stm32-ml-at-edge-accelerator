@@ -8,6 +8,8 @@ type GrafanaProps = {
 };
 
 export class Grafana extends Construct {
+  public url: string;
+
   constructor(scope: Construct, id: string, props: GrafanaProps) {
     super(scope, id);
     const { timestream } = props;
@@ -57,5 +59,7 @@ export class Grafana extends Construct {
       table: timestream.table,
       datasourceId: datasource.id,
     });
+
+    this.url = workspace.attrEndpoint;
   }
 }
