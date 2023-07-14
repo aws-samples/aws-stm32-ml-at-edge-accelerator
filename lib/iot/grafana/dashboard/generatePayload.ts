@@ -5,6 +5,7 @@ type Config = {
   datasourceId: string;
   database: string;
   table: string;
+  colorMappings: any;
 };
 
 export default (config: Config) => ({
@@ -54,12 +55,7 @@ export default (config: Config) => ({
             },
             mappings: [
               {
-                options: {
-                  car: {
-                    color: 'red',
-                    index: 0,
-                  },
-                },
+                options: config.colorMappings,
                 type: 'value',
               },
             ],
