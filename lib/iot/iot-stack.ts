@@ -4,14 +4,18 @@
 import { Stack, StackProps, CfnOutput, aws_s3 } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Code } from './code';
-import { Analytics } from './analytics';
+import { TimeStream } from './timeStream';
+import { Grafana } from './grafana/grafana';
 
 export class IotStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const { firmwareBucket, thingNamePrefix, publicKey } = new Code(this, 'Code');
-    new Analytics(this, 'Analytics');
+    const timestream = new TimeStream(this, 'TimeStream');
+    new Grafana(this, 'Grafana', {
+      timestream: { database: timestream.database, table: timestream.table },
+    });
 
     new CfnOutput(this, 'FirmwareBucket', {
       description: 'Firmware Bucket',
