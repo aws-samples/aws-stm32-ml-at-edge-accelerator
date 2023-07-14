@@ -13,10 +13,14 @@ export class IotStack extends Stack {
 
     const { firmwareBucket, thingNamePrefix, publicKey } = new Code(this, 'Code');
     const timestream = new TimeStream(this, 'TimeStream');
-    new Grafana(this, 'Grafana', {
+    const grafana = new Grafana(this, 'Grafana', {
       timestream: { database: timestream.database, table: timestream.table },
     });
 
+    new CfnOutput(this, 'GrafanaUrl', {
+      description: 'Grafana Url',
+      value: 'https://' + grafana.url,
+    });
     new CfnOutput(this, 'FirmwareBucket', {
       description: 'Firmware Bucket',
       value: firmwareBucket.bucketName,
