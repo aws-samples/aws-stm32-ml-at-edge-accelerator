@@ -27,6 +27,7 @@ This Project was only tested on region `eu-west-1`
   1.  Create a new secret for your ST password
       1.  Repeat the previous step but with the following secret name `ST_DEVCLOUD_PASSWORD_SECRET`
           run the following commands
+- In your AWS Account that will host the Iot Stack (if different) [enable AWS IAM Identity Center and create a user for yourself](https://console.aws.amazon.com/singlesignon/identity/home)
 - Bootstrap your account (each account if more than one) with the following command replacing your account and region placeholders
   ```
   npx cdk bootstrap aws://<ACCOUNT-NUMBER>/<REGION> --toolkit-stack-name CDKToolkit-StMicro --qualifier stmicro
@@ -132,20 +133,26 @@ Our device should be publishing MQTT messages now. If you go to AWS IoT console 
 
 These messages are streamed and stored into AWS Iot Analytics. Which will then be used as a datasource for Quicksight to visualise it.
 
-## Quicksight Dashboard
+## Grafana Dashboard
 
-To visualise your data, we will be using Quicksight. Go to quicksight console page and you will need to sign up to use Quicksight. While going through the steps when you come across the section titled `Allow access and autodiscovery for these resources` make sure you enable `AWS IoT Analytics`. Once you are inside Quicksight, just do the following:
+To see everything in action, we can login to Grafana and checkout our Dashboard.
+After deployment the url for our grafana instance will be printed out in your command line or you could get the url from your AWS console by visiting the Managed Grafana service page, however you won't have access yet.
+AWS Managed Grafana is using AWS IAM Identity Center for Authorisation previously known as AWS Single Sign-On (SSO).
 
-1. Click New Analysis
-1. Click New dataset
-1. Choose AWS IoT Analytics
-1. Select our Analytics dataset and click Create data source
-1. Click Visualize
-1. Choose the Free-form layout and click Create
+You should have an IAM Identity User created by now, so we need to give it permission to access our Grafana Instance.
 
-you should be able to display a graph as image below.
+1. Login to your console and visit the Managed Grafana servie page.
+1. Go to the grafana workspace created by our deployment.
+1. In the Authentication tab, click on `Configure users and user groups`
+1. Add your IAM Identity User
 
-![quicksight](./doc/images/quicksight.png)
+Now you are ready to visit grafana dashboard
+
+1. Just visit the grafana url either printed in your terminal or diplayed in your console under Grafana workspace Url.
+1. login using your IAM Identity User credentials
+1. Visit the dashboard section, choose browse and you can view the dashboard created by our deployment as seen below.
+
+   ![grafana dashboard](./doc/images/grafana-dashboard.png)
 
 ## Clean up
 
