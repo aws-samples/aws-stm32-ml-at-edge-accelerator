@@ -195,11 +195,6 @@ export default (config: Config) => ({
     templating: {
       list: [
         {
-          current: {
-            selected: true,
-            text: 'thing-ahmed',
-            value: 'thing-ahmed',
-          },
           datasource: {
             type: 'grafana-timestream-datasource',
             id: config.datasourceId,
