@@ -131,7 +131,7 @@ Once flashed if you are still connected to the device using the command `screen 
 
 Our device should be publishing MQTT messages now. If you go to AWS IoT console page and open MQTT test client, type the device name in the filter and subscribe. You will see the messages coming in.
 
-These messages are streamed and stored into AWS Iot Analytics. Which will then be used as a datasource for Quicksight to visualise it.
+These messages are streamed and stored into Amazon Timestream. Which will then be used as a datasource for Grafana to visualise it.
 
 ## Grafana Dashboard
 
