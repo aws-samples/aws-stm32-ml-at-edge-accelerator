@@ -151,6 +151,7 @@ Now you are ready to visit grafana dashboard
 1. Just visit the grafana url either printed in your terminal or diplayed in your console under Grafana workspace Url.
 1. login using your IAM Identity User credentials
 1. Visit the dashboard section, choose browse and you can view the dashboard created by our deployment as seen below.
+1. You change the device being displayed in top left dropdown menu called device
 
    ![grafana dashboard](./doc/images/grafana-dashboard.png)
 
