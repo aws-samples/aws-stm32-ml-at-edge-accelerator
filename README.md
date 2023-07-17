@@ -103,7 +103,7 @@ VaRDhiyj9BGkHbuAnGzM0gC+z6oYpxbkgE3qa6fHJoE99QTwrRh8XWwyCg==
 
 And follow below steps:
 
-1. connect to device using `screen /dev/tty.usbmodem103 115200`
+1. connect to device using `screen /dev/tty.usbmodem<REPLACE_WITH_CORRECT_NUMBER> 115200`
 1. run this command `pki import key ota_signer_pub`
 1. paste the public key you copied. you should a confirmation of key being registered
 
