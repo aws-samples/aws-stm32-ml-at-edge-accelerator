@@ -23,9 +23,9 @@ This Project was only tested on region `eu-west-1`
       1.  Choose type other
       1.  Choose Plaintext tab
       1.  Overwrite content with you username
-      1.  Give this secret the following name `ST_DEVCLOUD_USERNAME_SECRET` (if you require a different name, then ensure to update this new name in `cdk.json`)
+      1.  Give this secret the following name `STDEVCLOUD_USERNAME_SECRET` (if you require a different name, then ensure to update this new name in `cdk.json`)
   1.  Create a new secret for your ST password
-      1.  Repeat the previous step but with the following secret name `ST_DEVCLOUD_PASSWORD_SECRET`
+      1.  Repeat the previous step but with the following secret name `STDEVCLOUD_PASSWORD_SECRET`
           run the following commands
 - In your AWS Account that will host the Iot Stack (if different) [enable AWS IAM Identity Center and create a user for yourself](https://console.aws.amazon.com/singlesignon/identity/home)
 - Bootstrap your account (each account if more than one) with the following command replacing your account and region placeholders
