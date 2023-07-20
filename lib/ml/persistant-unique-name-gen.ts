@@ -2,13 +2,18 @@
 // SPDX-License-Identifier: MIT-0
 
 import { Construct } from 'constructs';
-import { Names, custom_resources } from 'aws-cdk-lib';
+import { Names, custom_resources, aws_iam } from 'aws-cdk-lib';
 
 export class PersistantUniqueNameGen extends Construct {
   private getNameCr: custom_resources.AwsCustomResource;
 
   constructor(scope: Construct, id: string) {
     super(scope, id);
+
+    const role = new aws_iam.Role(this, 'CrRole', {
+      assumedBy: new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
+      managedPolicies: [aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMFullAccess')],
+    });
 
     const paramName = Names.uniqueResourceName(this, {});
 
@@ -22,7 +27,6 @@ export class PersistantUniqueNameGen extends Construct {
           Type: 'String',
           Overwrite: false,
         },
-        // ignoreErrorCodesMatching: '400',
         physicalResourceId: custom_resources.PhysicalResourceId.of('PutName'),
       },
       onDelete: {
@@ -32,13 +36,11 @@ export class PersistantUniqueNameGen extends Construct {
           Name: paramName,
         },
       },
-      policy: custom_resources.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: custom_resources.AwsCustomResourcePolicy.ANY_RESOURCE,
-      }),
+      role,
     });
 
     const getNameCr = new custom_resources.AwsCustomResource(this, 'GetNameCr', {
-      onCreate: {
+      onUpdate: {
         service: 'SSM',
         action: 'getParameter',
         parameters: {
@@ -46,9 +48,7 @@ export class PersistantUniqueNameGen extends Construct {
         },
         physicalResourceId: custom_resources.PhysicalResourceId.of('GetName'),
       },
-      policy: custom_resources.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: custom_resources.AwsCustomResourcePolicy.ANY_RESOURCE,
-      }),
+      role,
     });
     getNameCr.node.addDependency(putNameCr);
 

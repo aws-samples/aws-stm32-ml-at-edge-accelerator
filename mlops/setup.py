@@ -12,7 +12,7 @@ with open("README.md", "r") as f:
     readme = f.read()
 
 
-required_packages = ["sagemaker==2.154.0"]
+required_packages = ["sagemaker==2.154.0", "PyYAML==5.4.1", "awscli>1.20.30"]
 extras = {
     "test": [
         "black",

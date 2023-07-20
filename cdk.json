@@ -21,8 +21,8 @@
         "ml": { "account": "<Account>", "region": "<Region>" },
         "iot": [{ "name": "dev", "account": "<Region>", "region": "<Region>" }]
       },
-      "stUsernameSecret": "ST_DEVCLOUD_USERNAME_SECRET",
-      "stPasswordSecret": "ST_DEVCLOUD_PASSWORD_SECRET",
+      "stUsernameSecret": "STDEVCLOUD_USERNAME_SECRET",
+      "stPasswordSecret": "STDEVCLOUD_PASSWORD_SECRET",
       "repo": {
         "name": "<Repo_Name>",
         "branch": "<Branch_Name>",
