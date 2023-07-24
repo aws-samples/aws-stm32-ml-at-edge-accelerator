@@ -27,7 +27,7 @@ This Project was only tested on region `eu-west-1`
   1.  Create a new secret for your ST password
       1.  Repeat the previous step but with the following secret name `STDEVCLOUD_PASSWORD_SECRET`
           run the following commands
-- In your AWS Account that will host the Iot Stack (if different) [enable AWS IAM Identity Center and create a user for yourself](https://console.aws.amazon.com/singlesignon/identity/home)
+- In your AWS Account that will host the Iot Stack [enable AWS IAM Identity Center and create a user for yourself](https://console.aws.amazon.com/singlesignon/identity/home)
 - Bootstrap your account (each account if more than one) with the following command replacing your account and region placeholders
   ```
   npx cdk bootstrap aws://<ACCOUNT-NUMBER>/<REGION> --toolkit-stack-name CDKToolkit-StMicro --qualifier stmicro
@@ -67,32 +67,37 @@ These steps assume you have a [B-U585I-IOT02A](https://www.arrow.com/en/products
 
 #### Provision Your Board
 
-To provision your board follow use scripts by following the below steps:
+To provision your board follow below steps:
 
-setup your environment
+1. Go to stm32 folder
 
-```
-sh tools/env_setup.sh
-```
+   ```
+   cd stm32
+   ```
 
-then source your environment
+1. Setup your environment
 
-```
-source .venv/bin/activate
-```
+   ```
+   sh tools/env_setup.sh
+   ```
 
-In your AWS Console go to the cloudformation page and then click on IoTStack and view the Output tab. Copy and run the `ProvisionScript` replacing the <> with a unique name for your device
+1. Source your environment
 
-the script should look like below
+   ```
+   source .venv/bin/activate
+   ```
 
-```
-python tools/provision.py --interactive  --thing-name <Thing-Name>
-```
+1. Plug in the device you want to provision
 
-After you provision the device successfully. Go back to the output tab of the IotStack in cloudformation page. And copy the public key value.
+1. In your AWS Console go to the cloudformation page and then click on IoTStack and view the Output tab. Copy and run the `ProvisionScript` replacing the <> with a unique name for your device, you can keep all default values but you will need to fill the WIFI SSID and Password details. The script should look like below
+   ```
+   python tools/provision.py --interactive  --thing-name <Thing-Name>
+   ```
+
+After you provision the device successfully. Go back to the output tab of the IotStack in cloudformation page. And copy the public key value ( including the public key labels before & after the code )
 
 **Warning**
-The displayed public key might not be properly formatted, please ensure you fix the format using any text editor to add the correct newlines as seen below before continuing
+The displayed public key might not be properly formatted, please ensure you fix the format using any text editor to add the correct newlines as seen below before continuing. Make sure you don't miss the line break that splits the key itself in 2 lines.
 
 ```
 -----BEGIN PUBLIC KEY-----
@@ -103,9 +108,10 @@ VaRDhiyj9BGkHbuAnGzM0gC+z6oYpxbkgE3qa6fHJoE99QTwrRh8XWwyCg==
 
 And follow below steps:
 
-1. connect to device using `screen /dev/tty.usbmodem<REPLACE_WITH_CORRECT_NUMBER> 115200`
-1. run this command `pki import key ota_signer_pub`
-1. paste the public key you copied. you should a confirmation of key being registered
+1. Connect to device using `screen /dev/tty.usb* 115200`,
+1. Connect to device using `screen <Serial_Port_Filename> 115200`, you need to find and replace the correct serial port file name e.g. `/dev/tty.usbmodem1203`, approach will be different for each platform, but you could try `ls /dev/tty.usb*`
+1. Run this command `pki import key ota_signer_pub`
+1. Paste the public key you copied. you should see a confirmation of key being registered, if not please make sure you followed and formatted the line breaks correctly as mentioned earlier
 
 ## Flashing the device
 
@@ -113,6 +119,9 @@ Before we can use over the air (OTA) firmware updates, we need to atlease flash 
 
 After deployment is successfull a binary firmware file should have been created in s3 bucket. You can find the name of the bucket in the same cloudformation output tab for the iotStack. The binary file will have the follwing name `b_u585i_iot02a_ntz.bin`, please download this file.
 If you have already installed [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html), follow these steps to flash the device with the firware.
+
+**Note**
+if installing on a Mac make sure you run the following command before installing to give it exec permission `sudo xattr -cr ~/SetupSTM32CubeProgrammer-macos.app`
 
 1. Connect your device to your computer
 1. Open STM32CubeProgrammer
@@ -123,13 +132,13 @@ If you have already installed [STM32CubeProgrammer](https://www.st.com/en/develo
 1. When finished click `Disconnect` on top right corner
 
 **Note**
-if installing on a Mac make sure you run the following command before installing to give it exec permission `sudo xattr -cr ~/SetupSTM32CubeProgrammer-macos.app`
+If you face any issue with device, try clicking on `Full chip erase` and re-program
 
-Once flashed if you are still connected to the device using the command `screen /dev/tty.usbmodem103 115200`, you should see the device starting to log sound class detected from sensors.
+Once flashed if you are still connected to the device using the screen command i.e. `screen /dev/tty.usbmodem103 115200`, you should see the device starting to log sound class detected from sensors.
 
 ## Iot
 
-Our device should be publishing MQTT messages now. If you go to AWS IoT console page and open MQTT test client, type the device name in the filter and subscribe. You will see the messages coming in.
+Our device should be publishing MQTT messages now. If you go to AWS IoT console page and open MQTT test client, type the following in the filter `<Device_Name>/mic_sensor_data` and subscribe. You will see the messages coming in from this device.
 
 These messages are streamed and stored into Amazon Timestream. Which will then be used as a datasource for Grafana to visualise it.
 
@@ -139,7 +148,7 @@ To see everything in action, we can login to Grafana and checkout our Dashboard.
 After deployment the url for our grafana instance will be printed out in your command line or you could get the url from your AWS console by visiting the Managed Grafana service page, however you won't have access yet.
 AWS Managed Grafana is using AWS IAM Identity Center for Authorisation previously known as AWS Single Sign-On (SSO).
 
-You should have an IAM Identity User created by now, so we need to give it permission to access our Grafana Instance.
+As mentioned in prequisite you should have an IAM Identity User created by now, if not then please [enable AWS IAM Identity Center and create a user for yourself](https://console.aws.amazon.com/singlesignon/identity/home). Now we need to give your user permission to access our Grafana Instance.
 
 1. Login to your console and visit the Managed Grafana servie page.
 1. Go to the grafana workspace created by our deployment.
@@ -154,6 +163,14 @@ Now you are ready to visit grafana dashboard
 1. You change the device being displayed in top left dropdown menu called device
 
    ![grafana dashboard](./doc/images/grafana-dashboard.png)
+
+## Continous Deployment
+
+Any changes in the repo will trigger the pipeline. The pipeline will go through all the stages set up, rebuild the Ml model if required and then eventually deploy to the device over the air.
+
+### OTA
+
+Any changes will eventually be deployed Over-The-Air. However no changes will be accepted by the device unless the semantic version is higher than its current version. So you must ensure for any new release you must update the semantic versioning in the following file [ota_firmware_version.c](stm32/Projects/b_u585i_iot02a_ntz/Src/ota_pal/ota_firmware_version.c)
 
 ## Clean up
 
