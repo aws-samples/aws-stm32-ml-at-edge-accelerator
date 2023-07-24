@@ -34,7 +34,7 @@ TOOLS_PATH="${WORKSPACE_PATH}/tools"
 
 [ -n "${DEBUG}" ] && echo "TOOLS_PATH:         ${TOOLS_PATH}"
 
-VENV_PATH=$(realpath "${WORKSPACE_PATH}"/.venv)
+VENV_PATH="${WORKSPACE_PATH}/.venv"
 [ -n "${DEBUG}" ] && echo "VENV_PATH:          ${VENV_PATH}"
 
 MCUBOOT_SCRIPTS=$(realpath "${WORKSPACE_PATH}"/Middleware/ARM/mcuboot/scripts)
