@@ -172,6 +172,15 @@ Any changes in the repo will trigger the pipeline. The pipeline will go through 
 
 Any changes will eventually be deployed Over-The-Air. However no changes will be accepted by the device unless the semantic version is higher than its current version. So you must ensure for any new release you must update the semantic versioning in the following file [ota_firmware_version.c](stm32/Projects/b_u585i_iot02a_ntz/Src/ota_pal/ota_firmware_version.c)
 
+So for example lets say we want to add a new class name `cat` to the Model.
+
+1. We go to [user_config.yaml](mlops/pipelines/stm/stm32ai-modelzoo/audio_event_detection/scripts/training/user_config.yaml) in training script section and add the new class in class_names array.
+1. We also go to [user_config.yaml](mlops/pipelines/stm/stm32ai-modelzoo/audio_event_detection/scripts/evaluate/user_config.yaml) in evaluate script section and add the new class in class_names array.
+1. Go to [ota_firmware_version.c](stm32/Projects/b_u585i_iot02a_ntz/Src/ota_pal/ota_firmware_version.c) and increment `APP_VERSION_MINOR`
+1. Commit and push your changes.
+
+Watch changes propagating through the pipeline till it lands on the devices connected.
+
 ## Clean up
 
 To remove all resources created by this stack run the following
