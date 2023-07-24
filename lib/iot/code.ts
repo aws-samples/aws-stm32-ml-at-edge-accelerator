@@ -179,7 +179,7 @@ export class Code extends Construct {
         phases: {
           build: {
             commands: [
-              'mkdir Middleware/STM32_AI_Library',
+              'mkdir -p Middleware/STM32_AI_Library',
               `cp -r $CODEBUILD_SRC_DIR_ml/stm32ai_files/Inc Middleware/STM32_AI_Library/`,
               `cp -r $CODEBUILD_SRC_DIR_ml/stm32ai_files/Lib Middleware/STM32_AI_Library/`,
               'ls Middleware/STM32_AI_Library/Inc',
