@@ -89,9 +89,9 @@ To provision your board follow below steps:
 
 1. Plug in the device you want to provision
 
-1. In your AWS Console go to the cloudformation page and then click on IoTStack and view the Output tab. Copy and run the `ProvisionScript` replacing the <> with a unique name for your device, you can keep all default values but you will need to fill the WIFI SSID and Password details. The script should look like below
+1. In your AWS Console go to the cloudformation page and then click on IoTStack and view the Output tab. Copy and run the `ProvisionScript` replacing the <> with a unique name for your device and AWS profile, you can keep all default values but you will need to fill the WIFI SSID and Password details. The script should look like below
    ```
-   python tools/provision.py --interactive  --thing-name <Thing-Name>
+   python tools/provision.py --interactive --aws-region <Region> --aws-profile <Profile> --thing-name <Thing-Name>
    ```
 
 After you provision the device successfully. Go back to the output tab of the IotStack in cloudformation page. And copy the public key value ( including the public key labels before & after the code )

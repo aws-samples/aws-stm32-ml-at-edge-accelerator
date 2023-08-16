@@ -27,7 +27,7 @@ export class IotStack extends Stack {
     });
     new CfnOutput(this, 'ProvisionScript', {
       description: 'Provision device',
-      value: `python tools/provision.py --interactive --thing-name ${thingNamePrefix}-<Replace_With_Unique_Name>`,
+      value: `python tools/provision.py --interactive --aws-region ${this.region} --aws-profile <Profile> --thing-name ${thingNamePrefix}-<Replace_With_Unique_Name>`,
     });
     new CfnOutput(this, 'PublicKey', {
       description: 'Public key used for signing firmware',

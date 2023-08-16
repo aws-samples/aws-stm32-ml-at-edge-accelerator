@@ -309,9 +309,11 @@ class TargetDevice:
 
         for key in keys:
             if key in self._staged_config:
-                cfg[key.decode("UTF-8")] = self._staged_config[key].decode("UTF-8")
+                cfg[key.decode("UTF-8")
+                    ] = self._staged_config[key].decode("UTF-8")
             elif key in self._running_config:
-                cfg[key.decode("UTF-8")] = self._running_config[key].decode("UTF-8")
+                cfg[key.decode("UTF-8")
+                    ] = self._running_config[key].decode("UTF-8")
         return cfg
 
     def conf_set(self, key, value):
@@ -335,11 +337,11 @@ class AwsHelper:
 
     def __init__(self, args):
         profile = "default"
-        if "aws-profile" in args:
+        if "aws_profile" in args:
             profile = args.aws_profile
 
         region = None
-        if "aws-region" in args:
+        if "aws_region" in args:
             region = args.aws_region
 
         access_key_id = None
@@ -387,7 +389,8 @@ class AwsHelper:
             self.iot_client = self.get_client("iot")
 
         if self.iot_client:
-            response = self.iot_client.describe_endpoint(endpointType="iot:Data-ATS")
+            response = self.iot_client.describe_endpoint(
+                endpointType="iot:Data-ATS")
 
             if "endpointAddress" in response:
                 endpoint_address = response["endpointAddress"]
@@ -409,7 +412,8 @@ class AwsHelper:
         if policyFound:
             logger.debug('Found existing "AllowAllDev" IoT core policy.')
         else:
-            logger.info('Existing policy "AllowAllDev" was not found. Creating it...')
+            logger.info(
+                'Existing policy "AllowAllDev" was not found. Creating it...')
 
         policyDocument = {
             "Version": "2012-10-17",
@@ -436,7 +440,8 @@ class AwsHelper:
         cert_response = cli.create_certificate_from_csr(
             certificateSigningRequest=csr, setAsActive=True
         )
-        logging.debug("CreateCertificateFromCsr response: {}".format(cert_response))
+        logging.debug(
+            "CreateCertificateFromCsr response: {}".format(cert_response))
         self.thing.update(cert_response)
 
         create_thing_resp = cli.create_thing(thingName=thing_name)
@@ -489,7 +494,8 @@ class AwsHelper:
         cert_response = cli.register_certificate_without_ca(
             certificatePem=cert, status="ACTIVE"
         )
-        logging.debug("RegisterCertificateWithoutCA response: {}".format(cert_response))
+        logging.debug(
+            "RegisterCertificateWithoutCA response: {}".format(cert_response))
         self.thing.update(cert_response)
 
         create_thing_resp = cli.create_thing(thingName=thing_name)
@@ -538,7 +544,8 @@ def find_serial_port(usbVendorId=0x0483, usbProductId=0x374E):
         ):
             logging.debug(
                 "Found device: {} with Manufacturer: {}, Vendor ID: {}, and Product ID: {}".format(
-                    port.device, port.manufacturer, hex(port.vid), hex(port.pid)
+                    port.device, port.manufacturer, hex(
+                        port.vid), hex(port.pid)
                 )
             )
             if port.vid == usbVendorId and port.pid == usbProductId:
@@ -580,9 +587,11 @@ def validate_pubkey(pub_key):
             result = False
     elif result and isinstance(key, ec.EllipticCurvePublicKey):
         if not (
-            isinstance(key.curve, ec.SECP256R1) or isinstance(key.curve, ec.SECP384R1)
+            isinstance(key.curve, ec.SECP256R1) or isinstance(
+                key.curve, ec.SECP384R1)
         ):
-            logging.error("Error: EC keys must of type secp256r1 or secp384r1.")
+            logging.error(
+                "Error: EC keys must of type secp256r1 or secp384r1.")
             result = False
     elif result:
         logging.error("Error: Public keys must be either RSA or EC type")
@@ -620,12 +629,14 @@ def validate_certificate(cert_pem, pub_key_pem, thing_name):
         # Check that subject CN is the thing name
         for attr in cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME):
             rfc4514_str = attr.rfc4514_string()
-            logging.debug("Parsed Certificate Attribute: {}".format(rfc4514_str))
+            logging.debug(
+                "Parsed Certificate Attribute: {}".format(rfc4514_str))
             if attr.value == thing_name:
                 thingNameFound = True
 
         if not thingNameFound:
-            logging.error("Error: Did not find thing name in Certificate subject.")
+            logging.error(
+                "Error: Did not find thing name in Certificate subject.")
             result = False
 
     if result:
@@ -633,12 +644,14 @@ def validate_certificate(cert_pem, pub_key_pem, thing_name):
         # Check that issuer CN is the thing name
         for attr in cert.issuer.get_attributes_for_oid(NameOID.COMMON_NAME):
             rfc4514_str = attr.rfc4514_string()
-            logging.debug("Parsed Certificate Attribute: {}".format(rfc4514_str))
+            logging.debug(
+                "Parsed Certificate Attribute: {}".format(rfc4514_str))
             if attr.value == thing_name:
                 thingNameFound = True
 
         if not thingNameFound:
-            logging.error("Error: Did not find thing name in Certificate Issuer")
+            logging.error(
+                "Error: Did not find thing name in Certificate Issuer")
             result = False
     return result
 
@@ -688,7 +701,8 @@ def validate_ca_certificate(cert):
         x509Cert = x509.load_pem_x509_certificate(cert["pem"])
     except ValueError:
         logging.error(
-            "Failed to parse certificate: CN: {}, O: {}".format(cert["CN"], cert["O"])
+            "Failed to parse certificate: CN: {}, O: {}".format(
+                cert["CN"], cert["O"])
         )
         result = False
 
