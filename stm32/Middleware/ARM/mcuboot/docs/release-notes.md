@@ -398,7 +398,3 @@ and RIOT.
   - ECDSA secp256r1 needs tinycrypt as well as the ASN.1 code from Mbed TLS
     (so still needs that present).
 
-### Known issues
-
-- The image header and TLV formats are planned to change with release 1.0:
-  https://runtimeco.atlassian.net/browse/MCUB-66
