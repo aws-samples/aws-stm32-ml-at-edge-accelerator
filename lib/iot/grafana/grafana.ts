@@ -34,6 +34,7 @@ export class Grafana extends Construct {
     const rotationFn = new aws_lambda_nodejs.NodejsFunction(this, 'key-rotation', {
       environment: { SECRET_NAME: apiKeySecret.secretName, WORKSPACE_ID: workspace.attrId },
     });
+    rotationFn.grantInvoke(new aws_iam.ServicePrincipal('secretsmanager.amazonaws.com'));
     apiKeySecret.grantWrite(rotationFn);
     rotationFn.role?.addManagedPolicy(
       aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSGrafanaAccountAdministrator')
