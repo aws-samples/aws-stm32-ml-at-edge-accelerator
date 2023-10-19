@@ -15,12 +15,14 @@ from stm32ai_dc.errors import ServerRouteNotFound
 
 
 def get_ssl_verify_status():
-    if os.environ.get('NO_SSL_VERIFY'):
-        import urllib3
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        return False
-    else:
-        return True
+    return False
+
+#    if os.environ.get('NO_SSL_VERIFY'):
+#        import urllib3
+#        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+#        return False
+#    else:
+#        return True
 
 
 def get_main_route_api_version(main_route_url: str) -> float:
