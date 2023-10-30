@@ -14,6 +14,7 @@ import {
   aws_kms,
   aws_logs,
   aws_sagemaker,
+  Duration,
 } from 'aws-cdk-lib';
 import { BuildTrigger } from '../trigger/build-trigger';
 
@@ -84,6 +85,7 @@ export class SagmakerPipeline extends Construct {
     });
 
     const build = new aws_codebuild.Project(this, 'MlBuild', {
+      timeout: Duration.minutes(120),
       encryptionKey: buildEncryptionKey,
       source: aws_codebuild.Source.s3({
         bucket: mlOpsCode.bucket,
