@@ -6,50 +6,50 @@
 #  * If no LICENSE file comes with this software, it is provided AS-IS.
 #  *--------------------------------------------------------------------------------------------*/
 
-from lookup_tables_generator import generate_mel_LUT_files
-from common_benchmark import analyze_footprints, Cloud_analyze, Cloud_benchmark, benchmark_model
-from sklearn.metrics import accuracy_score
-import random
-from evaluation import _aggregate_predictions, compute_accuracy_score
-from header_file_generator import gen_h_user_file
-import load_models
-from hydra.core.hydra_config import HydraConfig
-from preprocessing import preprocessing
-from callbacks import get_callbacks
-from common_visualize import vis_training_curves
-from visualize import _compute_confusion_matrix, _plot_confusion_matrix
-from datasets import _esc10_csv_to_tf_dataset, load_ESC_10, load_custom_esc_like_multiclass
-from data_augment import get_data_augmentation
-from benchmark import evaluate_TFlite_quantized_model
-from quantization import TFLite_PTQ_quantizer
-import traceback
-import numpy as np
-import os
-from tensorflow import keras
-import tensorflow as tf
-from omegaconf import OmegaConf
-from munch import DefaultMunch
-import mlflow
+
+
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+import tensorflow as tf
+import mlflow
+import random
+import os
+import numpy as np
+import load_models
+from omegaconf import OmegaConf
+from munch import DefaultMunch
+from tensorflow import keras
+from quantization import TFLite_PTQ_quantizer
+from benchmark import evaluate_TFlite_quantized_model
+from data_augment import get_data_augmentation
+from datasets import _esc10_csv_to_tf_dataset, load_ESC_10, load_custom_esc_like_multiclass, load_FSD50K
+from visualize import _compute_confusion_matrix, _plot_confusion_matrix
+from common_visualize import vis_training_curves
+from callbacks import get_callbacks
+from preprocessing import preprocessing
+from hydra.core.hydra_config import HydraConfig
+from header_file_generator import gen_h_user_file
+from evaluation import _aggregate_predictions, compute_accuracy_score
+
+from sklearn.metrics import accuracy_score
+from common_benchmark import analyze_footprints, Cloud_analyze, Cloud_benchmark, benchmark_model
+from lookup_tables_generator import generate_mel_LUT_files
 
 
 # Set seeds
 def setup_seed(seed):
     os.environ['PYTHONHASHSEED'] = str(seed)
-    random.seed(seed)
-    np.random.seed(seed)
+    random.seed(seed)  
+    np.random.seed(seed) 
     tf.random.set_seed(seed)  # tf cpu fix seed
-
+    
     tf.config.threading.set_inter_op_parallelism_threads(1)
     tf.config.threading.set_intra_op_parallelism_threads(1)
-
 
 def get_config(cfg):
     config_dict = OmegaConf.to_container(cfg)
     configs = DefaultMunch.fromDict(config_dict)
     return configs
-
 
 def mlflow_ini(cfg):
     mlflow.set_tracking_uri(cfg.mlflow.uri)
@@ -81,35 +81,61 @@ def get_loss(cfg):
     return loss
 
 
+def check_training(model: tf.keras.Model, sample_ds: tf.data.Dataset):
+    """
+    Check if there are operations that can rise exceptions during training.
+    Args:
+        model (tf.keras.Model): A keras model.
+    
+    Returns:
+        valid_training (bool): True if the training raise no exception.
+    """
+    valid_training = True
+    x_sample, y_sample = next(iter(sample_ds))
+    try:
+        with tf.GradientTape() as g:
+            y = model(x_sample, training=True)
+            loss = model.loss(y_sample, y)
+        _ = g.gradient(loss, model.trainable_variables)
+        
+    except Exception as error:
+        print(f"[WARN] {error}")
+        valid_training = False
+    return valid_training
+
+
 def train(cfg):
-    # get model
+    #get model
     model = load_models.get_model(cfg)
     print("[INFO] Model summary")
     model.summary()
 
-    # get loss
+    #get loss
     loss = get_loss(cfg)
 
-    # get optimizer
+    #get optimizer
     optimizer = get_optimizer(cfg)
 
-    # get callbacks
+    #get callbacks
     callbacks = get_callbacks(cfg)
 
-    # get data augmentation
-    data_augmentation, augment = get_data_augmentation(cfg)
+    #get data augmentation
+    data_augmentation,augment = get_data_augmentation(cfg)
 
-    # get pre_processing
-    # pre_process = preprocessing(cfg)
+    #get pre_processing
+    #pre_process = preprocessing(cfg)
     _, _ = preprocessing(cfg)
 
-    # get datasets
 
-    if cfg.dataset.name.lower() == "esc10" :
+    #get datasets
+
+    if cfg.dataset.name.lower()=="esc10" :
         train_ds, valid_ds, test_ds, clip_labels = load_ESC_10(cfg)
-    elif cfg.dataset.name.lower() == "custom" and not cfg.model.multi_label:
+    elif cfg.dataset.name.lower()=="custom" and not cfg.model.multi_label:
         train_ds, valid_ds, test_ds, clip_labels = load_custom_esc_like_multiclass(cfg)
-    elif cfg.dataset.name.lower() == "custom" and cfg.model.multi_label:
+    elif cfg.dataset.name.lower() == "fsd50k":
+        train_ds, valid_ds, test_ds, clip_labels = load_FSD50K(cfg)
+    elif cfg.dataset.name.lower()=="custom" and cfg.model.multi_label:
         raise NotImplementedError("Multilabel support not implemented yet !")
     else:
         raise NotImplementedError("Please choose a valid dataset ('esc10' or 'custom')")
@@ -126,26 +152,25 @@ def train(cfg):
         augmented_model.build((None, cfg.model.input_shape[0], cfg.model.input_shape[1], 1))
     else:
         augmented_model.build((None, cfg.model.input_shape[0], cfg.model.input_shape[1]))
-
+    
     print("[INFO] Augmented model summary")
     augmented_model.summary()
 
     # Compile the model
     augmented_model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
-
+    
     print("[INFO] Model sucessfully compiled")
+
 
     if cfg.quantization.quantize:
         print("[INFO] : Estimating the model footprints...")
         if cfg.quantization.quantizer == "TFlite_converter" and cfg.quantization.quantization_type == "PTQ":
             TFLite_PTQ_quantizer(cfg, model, train_ds=None, fake=True)
-            model_path = os.path.join(HydraConfig.get().runtime.output_dir,
-                                      "{}/{}".format(cfg.quantization.export_dir, "quantized_model.tflite"))
+            model_path = os.path.join(HydraConfig.get().runtime.output_dir, "{}/{}".format(cfg.quantization.export_dir, "quantized_model.tflite"))
         else:
             raise TypeError("Quantizer and quantization type not supported yet!")
     else:
-        model_path = os.path.join(HydraConfig.get().runtime.output_dir,
-                                  "{}/{}".format(cfg.general.saved_models_dir, "best_model.h5"))
+        model_path = os.path.join(HydraConfig.get().runtime.output_dir, "{}/{}".format(cfg.general.saved_models_dir, "best_model.h5"))
         model.save(model_path)
 
     # Evaluate model footprints with STM32Cube.AI
@@ -158,30 +183,37 @@ def train(cfg):
         except Exception as e:
             output_analyze = 0
             print("[FAIL] :", e)
-            # Write out an error file. This will be returned as the failureReason in the
-            # DescribeTrainingJob result.
-            trc = traceback.format_exc()
-            with open(os.path.join('/opt/ml/output', 'failure'), 'w') as s:
-                s.write('Exception during training: ' + str(e) + '\n' + trc)
-
             print("[INFO] : Offline benchmark launched...")
             benchmark_model(cfg, model_path)
 
     else:
         benchmark_model(cfg, model_path)
 
-    # train the model
+    # check if determinism can be enabled
+    if cfg.general.deterministic_ops:
+        sample_ds = train_ds.take(1)
+        tf.config.experimental.enable_op_determinism()
+        if not check_training(augmented_model, sample_ds):
+            print("[WARN] Some operations cannot be runned deterministically. Setting deterministic_ops to False.")
+            tf.config.experimental.enable_op_determinism.__globals__["_pywrap_determinism"].enable(False)
+    
+    #train the model
     print("[INFO] : Starting training...")
-    history = augmented_model.fit(train_ds, validation_data=valid_ds, callbacks=callbacks,
-                                  epochs=cfg.train_parameters.training_epochs)
+    history = augmented_model.fit(train_ds, validation_data=valid_ds, callbacks = callbacks, 
+    epochs=cfg.train_parameters.training_epochs)
 
     # Visualize training curves
-    vis_training_curves(history, cfg)
+    vis_training_curves(history,cfg)
+    
+    
+    #evaluate the float model on test set
 
-    # evaluate the float model on test set
-
+    
     # Load best trained model w/o data augmentation layers
-    best_model = augmented_model.layers[-1]
+    if augment:
+        best_model = augmented_model.layers[-1]
+    else:
+        best_model = augmented_model
     best_model.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
     best_model.save(
         os.path.join(HydraConfig.get().runtime.output_dir, cfg.general.saved_models_dir + '/' + "best_model.h5"))
@@ -198,22 +230,25 @@ def train(cfg):
                                               is_multilabel=cfg.model.multi_label,
                                               is_truth=True)
 
+    
+
     # generate the confusion matrix for the float model
     patch_level_accuracy = compute_accuracy_score(y_test, test_preds,
                                                   is_multilabel=cfg.model.multi_label)
     print("[INFO] : Patch-level accuracy on test set : {}".format(patch_level_accuracy))
     clip_level_accuracy = compute_accuracy_score(aggregated_truth, aggregated_preds,
-                                                 is_multilabel=cfg.model.multi_label)
+                                                  is_multilabel=cfg.model.multi_label)
     print("[INFO] : Clip-level accuracy on test set : {}".format(clip_level_accuracy))
 
     # Log accuracies in MLFLOW
     mlflow.log_metric("float_patch_test_acc", patch_level_accuracy)
     mlflow.log_metric("float_clip_test_acc", clip_level_accuracy)
 
+
     patch_level_confusion_matrix = _compute_confusion_matrix(y_test, test_preds,
-                                                             is_multilabel=cfg.model.multi_label)
+                                                               is_multilabel=cfg.model.multi_label)
     clip_level_confusion_matrix = _compute_confusion_matrix(aggregated_truth, aggregated_preds,
-                                                            is_multilabel=cfg.model.multi_label)
+                                                              is_multilabel=cfg.model.multi_label)
 
     _plot_confusion_matrix(patch_level_confusion_matrix,
                            class_names=cfg.dataset.class_names,
@@ -224,14 +259,14 @@ def train(cfg):
                            class_names=cfg.dataset.class_names,
                            title="Clip-level CM",
                            test_accuracy=clip_level_accuracy)
-
-    # quantize the model with training data
+    
+    #quantize the model with training data
     if cfg.quantization.quantize:
         print("[INFO] : Quantizing the model ... This might take few minutes ...")
 
         if cfg.data_augmentation.VolumeAugment:
             print("Applying Volume augmentation to quantization dataset")
-            def map_fn(x, y): return (data_augmentation(x), y)
+            map_fn = lambda x, y : (data_augmentation(x), y)
             train_ds = train_ds.map(map_fn)
 
         if cfg.quantization.quantizer == "TFlite_converter" and cfg.quantization.quantization_type == "PTQ":
@@ -255,10 +290,9 @@ def train(cfg):
             else:
                 benchmark_model(cfg, quantized_model_path)
 
-            # evaluate the quantized model
-            if cfg.quantization.evaluate == True:
-                q_patch_level_acc, q_clip_level_acc = evaluate_TFlite_quantized_model(
-                    quantized_model_path, X_test, y_test, clip_labels, cfg)
+            #evaluate the quantized model
+            if cfg.quantization.evaluate ==True:
+                q_patch_level_acc, q_clip_level_acc = evaluate_TFlite_quantized_model(quantized_model_path,X_test, y_test, clip_labels, cfg)
                 mlflow.log_metric("int_patch_test_acc", q_patch_level_acc)
                 mlflow.log_metric("int_clip_test_acc", q_clip_level_acc)
 
@@ -274,6 +308,7 @@ def train(cfg):
         generate_mel_LUT_files(cfg)
         print("Done")
 
-    # record the whole hydra working directory to get all infos
+
+    #record the whole hydra working directory to get all infos
     mlflow.log_artifact(HydraConfig.get().runtime.output_dir)
     mlflow.end_run()

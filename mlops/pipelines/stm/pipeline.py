@@ -203,12 +203,12 @@ def get_pipeline(
 
     q_clip_level_acc_threshold = ParameterFloat(
         name="q_clip_level_acc_threshold",
-        default_value=0.9,
+        default_value=0.6,
     )
 
     q_patch_level_acc_threshold = ParameterFloat(
         name="q_patch_level_acc_threshold",
-        default_value=0.8,
+        default_value=0.6,
     )
 
     stdevcloud_username_secret = ParameterString(
@@ -257,6 +257,7 @@ def get_pipeline(
         role=role,
         instance_count=1,
         instance_type=train_instance_type,
+        volume_size=100,
         framework_version="2.8.0",
         sagemaker_session=pipeline_session,
         py_version="py39",

@@ -13,6 +13,7 @@ def _is_power_of_two(n):
 
 def gen_h_user_file(config):
 
+
     # Bunch of checks to see if parameters are valid
     assert config.pre_processing.target_rate in [16000, 48000], (
         "Target rate should match one of the available ODR rates of digital microphone, e.g. 16000 or 48000")
@@ -23,7 +24,12 @@ def gen_h_user_file(config):
         "Window length must be lower or equal to n_fft"
     )
     # Sort names from config as was done when training model
-    class_names = sorted(config.dataset.class_names)
+    class_names = config.dataset.class_names
+    n_classes = len(class_names)
+    if config.dataset.use_other_class:
+        n_classes += 1
+        class_names.append("other")
+    class_names = sorted(class_names)
     # input_shape = params.model.input_shape
 
     classes = '{' + ','.join(['"' + x + '"' for x in class_names]) + '}'
@@ -69,7 +75,7 @@ def gen_h_user_file(config):
         f.write('#define CTRL_X_CUBE_AI_MODE_NAME                 "X-CUBE-AI AED"\n')
         f.write('#define CTRL_X_CUBE_AI_MODE_NB_OUTPUT            (1U)\n')
         f.write('#define CTRL_X_CUBE_AI_MODE_OUTPUT_1             (CTRL_AI_CLASS_DISTRIBUTION)\n')
-        f.write('#define CTRL_X_CUBE_AI_MODE_CLASS_NUMBER         ({}U)\n'.format(len(class_names)))
+        f.write('#define CTRL_X_CUBE_AI_MODE_CLASS_NUMBER         ({}U)\n'.format(n_classes))
         f.write('#define CTRL_X_CUBE_AI_MODE_CLASS_LIST           {}\n'.format(classes))
         f.write('#define CTRL_X_CUBE_AI_SENSOR_TYPE               COM_TYPE_MIC\n')
         f.write('#define CTRL_X_CUBE_AI_SENSOR_NAME               "imp34dt05"\n')
@@ -84,14 +90,13 @@ def gen_h_user_file(config):
         f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_HOP_LENGTH    ({}U)\n'.format(config.feature_extraction.hop_length))
         f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_NFFT          ({}U)\n'.format(config.feature_extraction.n_fft))
         f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_WINDOW_LENGTH ({}U)\n'.format(config.feature_extraction.window_length))
-        f.write('#define CTRL_X_CUBE_AI_OOD_THR                   (0.5F)')
         if config.feature_extraction.norm is None or config.feature_extraction.norm == "None":
-            f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_NORMALIZE     (0U) // (1U)\n')
+                f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_NORMALIZE     (0U) // (1U)\n')
         elif config.feature_extraction.norm == "slaney":
             f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_NORMALIZE     (1U) // (0U)\n')
         else:
             raise ValueError("feature_extraction.norm must either be None or 'slaney' for Getting Started")
-
+        
         if config.feature_extraction.htk:
             f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_FORMULA       (MEL_HTK) //MEL_SLANEY\n')
         else:
@@ -118,6 +123,7 @@ def gen_h_user_file(config):
         f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_MEL_LUT       (user_melFilterLut)\n')
         f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_MEL_START_IDX (user_melFiltersStartIndices)\n')
         f.write('#define CTRL_X_CUBE_AI_SPECTROGRAM_MEL_STOP_IDX  (user_melFiltersStopIndices)\n')
+        f.write('#define CTRL_X_CUBE_AI_OOD_THR                   ({}F)\n'.format(config.model.unknown_class_threshold))
         f.write('#define CTRL_SEQUENCE                            {CTRL_CMD_PARAM_AI,0}\n')
         f.write('\n')
         f.write('#ifdef __cplusplus\n')
