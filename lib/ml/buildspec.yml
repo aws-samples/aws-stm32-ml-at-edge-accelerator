@@ -18,20 +18,24 @@ phases:
         if [ $NOT_EXIST ]; then
           echo "Downloading FSD50K Dataset..." ;
 
-          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z01
-          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z02
-          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z03
-          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z04
-          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z05
-          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.zip
+          echo "Downloading Dev Audio..." ;
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z01 -q
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z02 -q
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z03 -q
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z04 -q
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z05 -q
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.zip -q
           zip -s 0 FSD50K.dev_audio.zip --out FSD50K.dev_audio-unsplit.zip
 
-          wget https://zenodo.org/records/4060432/files/FSD50K.eval_audio.z01
-          wget https://zenodo.org/records/4060432/files/FSD50K.eval_audio.zip
+          echo "Downloading Eval Audio..." ;
+          wget https://zenodo.org/records/4060432/files/FSD50K.eval_audio.z01 -q
+          wget https://zenodo.org/records/4060432/files/FSD50K.eval_audio.zip -q
           zip -s 0 FSD50K.eval_audio.zip --out FSD50K.eval_audio-unsplit.zip
 
-          wget https://zenodo.org/records/4060432/files/FSD50K.ground_truth.zip
+          echo "Downloading Ground Truth..." ;
+          wget https://zenodo.org/records/4060432/files/FSD50K.ground_truth.zip -q
 
+          echo "Unziping..." ;
           mkdir temp;
           unzip FSD50K.ground_truth.zip -d temp/;
           unzip FSD50K.eval_audio-unsplit.zip -d temp/;
