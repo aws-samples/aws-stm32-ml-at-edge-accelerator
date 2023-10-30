@@ -13,7 +13,22 @@ phases:
 
   pre_build:
     commands:
-      - aws s3 sync $CODEBUILD_SRC_DIR_datasets s3://${ARTIFACT_BUCKET}/train/datasets/ESC-50/  --include="*.wav" --include="*.csv"
+      - aws s3api head-object --bucket ${ARTIFACT_BUCKET} --key train/datasets/FSD50K || NOT_EXIST=true
+      - |
+        if [ $NOT_EXIST ]; then
+          echo "Download FSD50K Dataset" ;
+          curl https://zenodo.org/api/records/4060432/files-archive -o files.zip;
+          unzip files.zip;
+          rm files.zip;
+          mkdir temp;
+          unzip FSD50K.ground_truth.zip -d temp/;
+          zip -s 0 FSD50K.dev_audio.zip --out dev_audio-unsplit.zip;
+          unzip dev_audio-unsplit.zip -d temp/;
+          zip -s 0 FSD50K.eval_audio.zip --out eval_audio-unsplit.zip;
+          unzip eval_audio-unsplit.zip -d temp/;
+          aws s3 cp temp s3://${ARTIFACT_BUCKET}/train/datasets/FSD50K/ --recursive;
+        fi
+
   build:
     commands:
       - export PYTHONUNBUFFERED=TRUE

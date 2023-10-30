@@ -82,19 +82,13 @@ export class SagmakerPipeline extends Construct {
       removalPolicy: RemovalPolicy.DESTROY,
       enableKeyRotation: true,
     });
+
     const build = new aws_codebuild.Project(this, 'MlBuild', {
       encryptionKey: buildEncryptionKey,
       source: aws_codebuild.Source.s3({
         bucket: mlOpsCode.bucket,
         path: mlOpsCode.s3ObjectKey,
       }),
-      secondarySources: [
-        aws_codebuild.Source.gitHub({
-          identifier: 'datasets',
-          owner: 'karolpiczak',
-          repo: 'ESC-50',
-        }),
-      ],
       cache: aws_codebuild.Cache.local(aws_codebuild.LocalCacheMode.SOURCE),
       artifacts: aws_codebuild.Artifacts.s3({
         bucket: mlOutputBucket,
@@ -124,7 +118,7 @@ export class SagmakerPipeline extends Construct {
       aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSageMakerFullAccess')
     );
 
-    new BuildTrigger(this, 'MlBuildTrigger', { buildProject: build, state: mlOpsCode.assetHash });
+    // new BuildTrigger(this, 'MlBuildTrigger', { buildProject: build, state: mlOpsCode.assetHash });
 
     const key = new aws_kms.Key(this, 'KMS', {
       removalPolicy: RemovalPolicy.DESTROY,
