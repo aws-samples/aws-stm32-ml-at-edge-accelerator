@@ -118,7 +118,7 @@ export class SagmakerPipeline extends Construct {
       aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSageMakerFullAccess')
     );
 
-    // new BuildTrigger(this, 'MlBuildTrigger', { buildProject: build, state: mlOpsCode.assetHash });
+    new BuildTrigger(this, 'MlBuildTrigger', { buildProject: build, state: mlOpsCode.assetHash });
 
     const key = new aws_kms.Key(this, 'KMS', {
       removalPolicy: RemovalPolicy.DESTROY,
