@@ -37,9 +37,9 @@ phases:
 
           echo "Unziping..." ;
           mkdir temp;
-          unzip FSD50K.ground_truth.zip -q -d temp/;
-          unzip FSD50K.eval_audio-unsplit.zip -q -d temp/;
-          unzip FSD50K.dev_audio-unsplit.zip -q -d temp/;
+          unzip -q FSD50K.ground_truth.zip -d temp/;
+          unzip -q FSD50K.eval_audio-unsplit.zip -d temp/;
+          unzip -q FSD50K.dev_audio-unsplit.zip -d temp/;
 
           echo "Uploading..." ;
           aws s3 cp temp s3://${ARTIFACT_BUCKET}/train/datasets/FSD50K/ --recursive --quiet;
