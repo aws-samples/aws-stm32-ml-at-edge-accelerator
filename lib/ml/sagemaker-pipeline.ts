@@ -93,7 +93,6 @@ export class SagmakerPipeline extends Construct {
         bucket: mlOpsCode.bucket,
         path: mlOpsCode.s3ObjectKey,
       }),
-      cache: aws_codebuild.Cache.local(aws_codebuild.LocalCacheMode.SOURCE),
       artifacts: aws_codebuild.Artifacts.s3({
         bucket: mlOutputBucket,
         includeBuildId: false,
