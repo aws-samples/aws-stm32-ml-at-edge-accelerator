@@ -17,6 +17,7 @@ import {
   Duration,
 } from 'aws-cdk-lib';
 import { BuildTrigger } from '../trigger/build-trigger';
+import { ComputeType } from 'aws-cdk-lib/aws-codebuild';
 
 type SageMakerPipelineProps = {
   project: aws_sagemaker.CfnProject;
@@ -85,6 +86,7 @@ export class SagmakerPipeline extends Construct {
     });
 
     const build = new aws_codebuild.Project(this, 'MlBuild', {
+      environment: { computeType: ComputeType.X2_LARGE },
       timeout: Duration.minutes(120),
       encryptionKey: buildEncryptionKey,
       source: aws_codebuild.Source.s3({
