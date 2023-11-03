@@ -14,7 +14,7 @@ import stm_ai_driver as stmaic
 from hydra.core.hydra_config import HydraConfig
 
 
-def stm32ai_deploy(cfg, debug=False):
+def stm32ai_deploy(cfg, debug=False, additional_files=None, stmaic_conf_filename: str = 'stmaic_c_project.conf'):
 
     def stmaic_local_call(cfg, session):
         # Add environment variables
@@ -44,7 +44,7 @@ def stm32ai_deploy(cfg, debug=False):
     stm32ai_output = os.path.join(HydraConfig.get().runtime.output_dir, "stm32ai_files")
 
     # 2 - set the board configuration
-    board_conf = os.path.join(cfg.stm32ai.c_project_path, "stmaic_c_project.conf")
+    board_conf = os.path.join(cfg.stm32ai.c_project_path, stmaic_conf_filename)
     board = stmaic.STMAiBoardConfig(board_conf)
     session.set_board(board)
     print("Selected board : ", board, flush=True)
@@ -69,7 +69,10 @@ def stm32ai_deploy(cfg, debug=False):
     print("Building the STM32 c-project..", flush=True)
 
     user_files.extend([os.path.join(HydraConfig.get().runtime.output_dir, "C_header/ai_model_config.h")])
-
+    if additional_files:
+        for f in additional_files:
+            user_files.extend([os.path.join(HydraConfig.get().runtime.output_dir, f)])
+            
     stmaic.build(session, user_files=user_files)
 
     print('done')

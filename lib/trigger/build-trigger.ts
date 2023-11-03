@@ -2,7 +2,14 @@
 // SPDX-License-Identifier: MIT-0
 
 import { Construct } from 'constructs';
-import { aws_codebuild, aws_iam, aws_lambda_nodejs, CustomResource, custom_resources } from 'aws-cdk-lib';
+import {
+  aws_codebuild,
+  aws_iam,
+  aws_lambda_nodejs,
+  CustomResource,
+  custom_resources,
+  Duration,
+} from 'aws-cdk-lib';
 
 type BuildTriggerProps = {
   buildProject: aws_codebuild.Project;
@@ -28,6 +35,8 @@ export class BuildTrigger extends Construct {
         },
         initialPolicy: [buildPolicy],
       }),
+      queryInterval: Duration.minutes(1),
+      totalTimeout: Duration.minutes(60),
     });
 
     const buildCr = new CustomResource(this, 'BuildCr', {
