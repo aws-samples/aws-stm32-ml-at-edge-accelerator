@@ -13,14 +13,36 @@ phases:
 
   pre_build:
     commands:
-      - aws s3api head-object --bucket ${ARTIFACT_BUCKET} --key train/datasets/ESC-50 || NOT_EXIST=true
+      - aws s3api head-object --bucket ${ARTIFACT_BUCKET} --key train/datasets/FSD50K/FSD50K.ground_truth/dev.csv || NOT_EXIST=true
       - |
         if [ $NOT_EXIST ]; then
-          echo "Downloading ESC-50 Dataset..." ;
-          git clone https://github.com/karolpiczak/ESC-50.git ./temp ;
+          echo "Downloading FSD50K Dataset..." ;
+
+          echo "Downloading Dev Audio..." ;
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z01 -q;
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z02 -q;
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z03 -q;
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z04 -q;
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.z05 -q;
+          wget https://zenodo.org/records/4060432/files/FSD50K.dev_audio.zip -q;
+          zip -q -s 0 FSD50K.dev_audio.zip --out FSD50K.dev_audio-unsplit.zip;
+
+          echo "Downloading Eval Audio..." ;
+          wget https://zenodo.org/records/4060432/files/FSD50K.eval_audio.z01 -q;
+          wget https://zenodo.org/records/4060432/files/FSD50K.eval_audio.zip -q;
+          zip -q -s 0 FSD50K.eval_audio.zip --out FSD50K.eval_audio-unsplit.zip;
+
+          echo "Downloading Ground Truth..." ;
+          wget https://zenodo.org/records/4060432/files/FSD50K.ground_truth.zip -q;
+
+          echo "Unziping..." ;
+          mkdir temp;
+          unzip -q FSD50K.ground_truth.zip -d temp/;
+          unzip -q FSD50K.eval_audio-unsplit.zip -d temp/;
+          unzip -q FSD50K.dev_audio-unsplit.zip -d temp/;
 
           echo "Uploading..." ;
-          aws s3 cp temp s3://${ARTIFACT_BUCKET}/train/datasets/ESC-50/ --recursive --quiet;
+          aws s3 cp temp s3://${ARTIFACT_BUCKET}/train/datasets/FSD50K/ --recursive --quiet;
         fi
 
   build:

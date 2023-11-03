@@ -13,20 +13,8 @@ train_parameters:
   restore_best_weights: True
 
 dataset:
-  name: esc10
-  class_names:
-    [
-      'dog',
-      'chainsaw',
-      'crackling_fire',
-      'helicopter',
-      'rain',
-      'crying_baby',
-      'clock_tick',
-      'sneezing',
-      'rooster',
-      'sea_waves',
-    ]
+  name: fsd50k
+  class_names: ['Speech', 'Gunshot_and_gunfire', 'Crying_and_sobbing', 'Knock', 'Glass']
   audio_path: /opt/ml/input/data/train/datasets/ESC-50/audio
   csv_path: /opt/ml/input/data/train/datasets/ESC-50/meta/esc50.csv
   file_extension: .wav
