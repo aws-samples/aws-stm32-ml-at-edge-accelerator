@@ -15,8 +15,13 @@ import {
   aws_logs,
   aws_sagemaker,
   Duration,
+  aws_lambda_nodejs,
+  aws_lambda,
+  aws_cloudformation,
+  aws_events_targets,
+  triggers,
+  aws_ssm,
 } from 'aws-cdk-lib';
-import { BuildTrigger } from '../trigger/build-trigger';
 import { ComputeType } from 'aws-cdk-lib/aws-codebuild';
 
 type SageMakerPipelineProps = {
@@ -121,7 +126,53 @@ export class SagmakerPipeline extends Construct {
       aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSageMakerFullAccess')
     );
 
-    new BuildTrigger(this, 'MlBuildTrigger', { buildProject: build, state: mlOpsCode.assetHash });
+    const param = new aws_ssm.StringParameter(this, 'StringParameter', {
+      stringValue: '0',
+    });
+
+    const role = new aws_iam.Role(this, 'FnRole', {
+      assumedBy: new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
+      managedPolicies: [
+        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMFullAccess'),
+        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodeBuildAdminAccess'),
+      ],
+    });
+
+    const { ref: waitCompletionUrl } = new aws_cloudformation.CfnWaitConditionHandle(
+      this,
+      'CfnWaitConditionHandle' + Date.now()
+    );
+
+    new aws_cloudformation.CfnWaitCondition(this, 'CfnWaitCondition' + Date.now(), {
+      handle: waitCompletionUrl,
+      timeout: '7200',
+      count: 1,
+    });
+
+    const fn = new aws_lambda_nodejs.NodejsFunction(this, 'wait-handler', {
+      runtime: aws_lambda.Runtime.NODEJS_18_X,
+      environment: {
+        assetHash: mlOpsCode.assetHash,
+        paramName: param.parameterName,
+        projectName: build.projectName,
+        waitCompletionUrl,
+        runEveryTime: Date.now().toString(),
+      },
+      role,
+    });
+
+    build.onBuildSucceeded('BuildSucceed', {
+      target: new aws_events_targets.LambdaFunction(fn),
+    });
+    build.onBuildFailed('BuildFail', {
+      target: new aws_events_targets.LambdaFunction(fn),
+    });
+
+    new triggers.Trigger(this, 'BuildTrigger', {
+      handler: fn,
+      invocationType: triggers.InvocationType.EVENT,
+      executeAfter: [build],
+    });
 
     const key = new aws_kms.Key(this, 'KMS', {
       removalPolicy: RemovalPolicy.DESTROY,
