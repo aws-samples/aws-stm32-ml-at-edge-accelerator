@@ -13,16 +13,15 @@ from requests.structures import CaseInsensitiveDict
 from stm32ai_dc.backend.cloud.endpoints import get_supported_versions_ep
 from stm32ai_dc.errors import ServerRouteNotFound
 
-
+# Connection is unstable with this on
 def get_ssl_verify_status():
     return False
-
-#    if os.environ.get('NO_SSL_VERIFY'):
-#        import urllib3
-#        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-#        return False
-#    else:
-#        return True
+    # if os.environ.get('NO_SSL_VERIFY'):
+    #     import urllib3
+    #     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+    #     return False
+    # else:
+    #     return True
 
 
 def get_main_route_api_version(main_route_url: str) -> float:
