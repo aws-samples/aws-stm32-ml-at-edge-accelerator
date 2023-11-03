@@ -7,36 +7,29 @@
 
 class InvalidCredentialsException(Exception):
     "Raised when a login fails due to credentials error"
-
     def __init__(self) -> None:
         super().__init__('Invalid credentials. Please verify.')
 
-
 class LoginFailureException(Exception):
-    def __init__(self, username: str, password: str, details: str = '') -> None:
+    def __init__(self, username: str, password: str, details:str='') -> None:
         username = '' if username is None else username
         password = '' if password is None else password
 
         msg = f"Fail to login with username: '{username}' and password: '{'*'*len(password)}'. {details}"
         super().__init__(msg)
 
-# Server errors
-
-
+### Server errors
 class ServerError(Exception):
     def __init__(self, message) -> None:
         super().__init__(message)
-
 
 class AnalyzeServerError(ServerError):
     def __init__(self, message) -> None:
         super().__init__(f"AnalyzeServerError: {message}")
 
-
 class GenerateServerError(ServerError):
     def __init__(self, message) -> None:
         super().__init__(f"GenerateServerError: {message}")
-
 
 class ValidateServerError(ServerError):
     def __init__(self, message) -> None:
@@ -48,12 +41,9 @@ class BenchmarkError(Exception):
     def __init__(self, message) -> None:
         super().__init__(f"BenchmarkError: {message}")
 # Error linked to server side errors
-
-
 class BenchmarkServerError(ServerError, BenchmarkError):
     def __init__(self, message) -> None:
         super().__init__(f"BenchmarkServerError: {message}")
-
 
 class BenchmarkFailure(BenchmarkError):
     def __init__(self, board, message) -> None:
@@ -65,24 +55,20 @@ class ServerRouteNotFound(ServerError):
         super().__init__(f"RouteNotRoundError: {message}")
 
 
-# Functional errors
+### Functional errors
 class ModelNotFoundError(Exception):
     def __init__(self, message) -> None:
         super().__init__(f"ModelNotFoundError: {message}")
-
 
 class WrongTypeError(Exception):
     def __init__(self, value, expected_type) -> None:
         super().__init__(f"{type(value)} value received, expected: {expected_type}")
 
-
 class InternalErrorThatShouldNotHappened(Exception):
     def __init__(self, why) -> None:
         super().__init__(why)
 
-# Error linked to wrong parameter type/values
-
-
+# Error linked to wrong parameter type/values 
 class ParameterError(Exception):
     def __init__(self, why) -> None:
         super().__init__(why)
@@ -91,7 +77,6 @@ class ParameterError(Exception):
 class BenchmarkParameterError(ParameterError, BenchmarkError):
     def __init__(self, board, message) -> None:
         super().__init__(f"Benchmark failed on board {board}: {message}")
-
 
 class FileFormatError(Exception):
     def __init__(self, why) -> None:

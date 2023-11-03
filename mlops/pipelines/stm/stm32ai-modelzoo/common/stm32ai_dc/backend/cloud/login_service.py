@@ -83,8 +83,9 @@ class LoginService:
             except InvalidCredentialsException as e:
                 raise e
             except Exception as e:
-                print('Login issue, retry (' + str(i + 1) + '/5)')
+                print('Login issue, retry (' + str(i+1) + '/5)')
                 time.sleep(5)
+
 
     def _login(self, username, password) -> str:
         # Starts a requests sesson
@@ -129,8 +130,8 @@ class LoginService:
 
         parsed_url = urlparse(resp.url)
         # Construct Login URL = https://my.st.com/cas/login/......
-        login_url = urljoin(parsed_url.scheme + "://"
-                            + parsed_url.netloc, form_action)
+        login_url = urljoin(parsed_url.scheme + "://" +
+                            parsed_url.netloc, form_action)
         resp = s.post(
             url=login_url,
             data={
@@ -143,8 +144,7 @@ class LoginService:
         )
 
         if (resp.status_code == 200):
-            failure_regex = re.search(
-                r'You have provided the wrong password. You have \d+ attempts left after which your account password will expire.', resp.text)
+            failure_regex = re.search(r'You have provided the wrong password. You have \d+ attempts left after which your account password will expire.', resp.text)
             if (failure_regex):
                 raise InvalidCredentialsException
 
