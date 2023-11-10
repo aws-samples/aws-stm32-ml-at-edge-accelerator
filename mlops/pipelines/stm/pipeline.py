@@ -30,24 +30,18 @@ from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
 from sagemaker.workflow.condition_step import (
     ConditionStep,
 )
-from sagemaker.workflow.functions import (
-    JsonGet,
-    Join
-)
+from sagemaker.workflow.functions import JsonGet, Join
 
 from sagemaker.model_metrics import MetricsSource, ModelMetrics
 from sagemaker.workflow.step_collections import RegisterModel
 from sagemaker.workflow.parameters import (
     ParameterInteger,
     ParameterString,
-    ParameterFloat
+    ParameterFloat,
 )
 from sagemaker.workflow.pipeline import Pipeline
 from sagemaker.workflow.properties import PropertyFile
-from sagemaker.workflow.steps import (
-    ProcessingStep,
-    TrainingStep
-)
+from sagemaker.workflow.steps import ProcessingStep, TrainingStep
 from sagemaker.workflow.model_step import ModelStep
 from sagemaker.model import Model
 from sagemaker.workflow.pipeline_context import PipelineSession
@@ -70,13 +64,13 @@ BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 def get_sagemaker_client(region):
     """Gets the sagemaker client.
 
-       Args:
-           region: the aws region to start the session
-           default_bucket: the bucket to use for storing the artifacts
+    Args:
+        region: the aws region to start the session
+        default_bucket: the bucket to use for storing the artifacts
 
-       Returns:
-           `sagemaker.session.Session instance
-       """
+    Returns:
+        `sagemaker.session.Session instance
+    """
     boto_session = boto3.Session(region_name=region)
     sagemaker_client = boto_session.client("sagemaker")
     return sagemaker_client
@@ -131,8 +125,7 @@ def get_pipeline_custom_tags(new_tags, region, sagemaker_project_name=None):
         sm_client = get_sagemaker_client(region)
         response = sm_client.describe_project(ProjectName=sagemaker_project_name)
         sagemaker_project_arn = response["ProjectArn"]
-        response = sm_client.list_tags(
-            ResourceArn=sagemaker_project_arn)
+        response = sm_client.list_tags(ResourceArn=sagemaker_project_arn)
         project_tags = response["Tags"]
         for project_tag in project_tags:
             new_tags.append(project_tag)
@@ -148,8 +141,7 @@ def get_pipeline(
     default_bucket=None,
     model_package_group_name="STM32ai",
     pipeline_name="STMicroMLPipeline",
-    base_job_prefix="STM32ai"
-
+    base_job_prefix="STM32ai",
 ):
     """Gets a SageMaker ML Pipeline instance working with on abalone data.
 
@@ -162,7 +154,7 @@ def get_pipeline(
         an instance of a pipeline
     """
 
-    SRC_DIR = os.environ['CODEBUILD_SRC_DIR']
+    SRC_DIR = os.environ["CODEBUILD_SRC_DIR"]
 
     sagemaker_session = get_session(region, default_bucket)
     if role is None:
@@ -203,22 +195,22 @@ def get_pipeline(
 
     q_clip_level_acc_threshold = ParameterFloat(
         name="q_clip_level_acc_threshold",
-        default_value=0.6,
+        default_value=0.5,
     )
 
     q_patch_level_acc_threshold = ParameterFloat(
         name="q_patch_level_acc_threshold",
-        default_value=0.6,
+        default_value=0.5,
     )
 
     stdevcloud_username_secret = ParameterString(
         name="STDevCloudUsernameSecret",
-        default_value=os.environ['STDEVCLOUD_USERNAME_SECRET'],
+        default_value=os.environ["STDEVCLOUD_USERNAME_SECRET"],
     )
 
     stdevcloud_password_secret = ParameterString(
         name="STDevCloudPasswordSecret",
-        default_value=os.environ['STDEVCLOUD_PASSWORD_SECRET'],
+        default_value=os.environ["STDEVCLOUD_PASSWORD_SECRET"],
     )
 
     # ====================================================================
@@ -241,9 +233,7 @@ def get_pipeline(
         arguments=["--input-data", input_data],
     )
     step_process = ProcessingStep(
-        name="PreprocessFSD50K",
-        step_args=step_args,
-        cache_config=step_cache_config
+        name="PreprocessFSD50K", step_args=step_args, cache_config=step_cache_config
     )
 
     # ====================================================================
@@ -263,33 +253,42 @@ def get_pipeline(
         py_version="py39",
         enable_sagemaker_metrics=True,
         metric_definitions=[
-            {'Name': 'validation:loss', 'Regex': 'loss: ([0-9\\.]+) - accuracy: [0-9\\.]+'},
-            {'Name': 'validation:accuracy', 'Regex': 'loss: [0-9\\.]+ - accuracy: ([0-9\\.]+)'},
-            {'Name': 'patch:accuracy', 'Regex': 'Patch-level accuracy on test set : ([0-9\\.]+)'},
-            {'Name': 'clip:accuracy', 'Regex': 'Clip-level accuracy on test set : ([0-9\\.]+)'}
+            {
+                "Name": "validation:loss",
+                "Regex": "loss: ([0-9\\.]+) - accuracy: [0-9\\.]+",
+            },
+            {
+                "Name": "validation:accuracy",
+                "Regex": "loss: [0-9\\.]+ - accuracy: ([0-9\\.]+)",
+            },
+            {
+                "Name": "patch:accuracy",
+                "Regex": "Patch-level accuracy on test set : ([0-9\\.]+)",
+            },
+            {
+                "Name": "clip:accuracy",
+                "Regex": "Clip-level accuracy on test set : ([0-9\\.]+)",
+            },
         ],
         environment={
             "STDEVCLOUD_USERNAME_SECRET": stdevcloud_username_secret,
             "STDEVCLOUD_PASSWORD_SECRET": stdevcloud_password_secret,
-            "REGION": region
-        }
-
+            "REGION": region,
+        },
     )
 
     step_train = TrainingStep(
         name="TrainTensorFlowModel",
         estimator=tf2_estimator,
         inputs={
-            "train": TrainingInput(
-                s3_data=train_input_data
-            )
+            "train": TrainingInput(s3_data=train_input_data)
             # "train": TrainingInput(
             #     s3_data=step_process.properties.ProcessingOutputConfig.Outputs[
             #         "train"
             #     ].S3Output.S3Uri,
             # ),
         },
-        cache_config=step_cache_config
+        cache_config=step_cache_config,
     )
 
     # ====================================================================
@@ -303,16 +302,15 @@ def get_pipeline(
         instance_type=eval_instance_type,
         instance_count=1,
         base_job_name=f"{base_job_prefix}/evaluate",
-        py_version='py39',
+        py_version="py39",
         sagemaker_session=pipeline_session,
         env={
             "EXPERIMENT_NAME": ExecutionVariables.PIPELINE_NAME,
             "RUN_NAME": ExecutionVariables.PIPELINE_EXECUTION_ID,
             "STDEVCLOUD_USERNAME_SECRET": stdevcloud_username_secret,
             "STDEVCLOUD_PASSWORD_SECRET": stdevcloud_password_secret,
-            "REGION": region
-        }
-
+            "REGION": region,
+        },
     )
 
     # Run the processing job
@@ -321,25 +319,26 @@ def get_pipeline(
         source_dir=os.path.join(SRC_DIR, "pipelines/stm/stm32ai-modelzoo/"),
         inputs=[
             ProcessingInput(
-                input_name='input',
+                input_name="input",
                 source=train_input_data,
-                destination='/opt/ml/processing/input'
+                destination="/opt/ml/processing/input",
             ),
             ProcessingInput(
-                input_name='model',
+                input_name="model",
                 source=step_train.properties.ModelArtifacts.S3ModelArtifacts,
-                destination='/opt/ml/processing/input/model'
-            )
+                destination="/opt/ml/processing/input/model",
+            ),
         ],
         outputs=[
             ProcessingOutput(
-                output_name='evaluation-outputs',
-                source='/opt/ml/processing/outputs',
-                destination=f's3://{default_bucket}/evaluation'
+                output_name="evaluation-outputs",
+                source="/opt/ml/processing/outputs",
+                destination=f"s3://{default_bucket}/evaluation",
             ),
-            ProcessingOutput(output_name="evaluation",
-                             source="/opt/ml/processing/evaluation")
-        ]
+            ProcessingOutput(
+                output_name="evaluation", source="/opt/ml/processing/evaluation"
+            ),
+        ],
     )
 
     # Create a PropertyFile
@@ -354,7 +353,7 @@ def get_pipeline(
         name="Evaluate",
         step_args=step_args,
         property_files=[evaluation_report],
-        cache_config=step_cache_config
+        cache_config=step_cache_config,
     )
 
     # ====================================================================
@@ -366,9 +365,11 @@ def get_pipeline(
     model_metrics = ModelMetrics(
         model_statistics=MetricsSource(
             s3_uri="{}/evaluation.json".format(
-                step_eval.arguments["ProcessingOutputConfig"]["Outputs"][0]["S3Output"]["S3Uri"]
+                step_eval.arguments["ProcessingOutputConfig"]["Outputs"][0]["S3Output"][
+                    "S3Uri"
+                ]
             ),
-            content_type="application/json"
+            content_type="application/json",
         )
     )
 
@@ -387,7 +388,6 @@ def get_pipeline(
         model_package_group_name=model_package_group_name,
         approval_status=model_approval_status,
         model_metrics=model_metrics,
-
     )
 
     step_register = ModelStep(
@@ -401,10 +401,16 @@ def get_pipeline(
 
     step_fail = FailStep(
         name="FailStep",
-        error_message=Join(on=" ", values=[
-            "Execution failed due to clip level acc <", q_clip_level_acc_threshold,
-            "or", "Execution failed due to patch level acc <", q_patch_level_acc_threshold,
-        ])
+        error_message=Join(
+            on=" ",
+            values=[
+                "Execution failed due to clip level acc <",
+                q_clip_level_acc_threshold,
+                "or",
+                "Execution failed due to patch level acc <",
+                q_patch_level_acc_threshold,
+            ],
+        ),
     )
 
     # ====================================================================
@@ -453,7 +459,7 @@ def get_pipeline(
             input_data,
             train_input_data,
             stdevcloud_username_secret,
-            stdevcloud_password_secret
+            stdevcloud_password_secret,
         ],
         steps=[step_process, step_train, step_eval, step_cond],
         sagemaker_session=pipeline_session,

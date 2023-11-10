@@ -143,12 +143,6 @@ export class SagmakerPipeline extends Construct {
       'CfnWaitConditionHandle' + Date.now()
     );
 
-    new aws_cloudformation.CfnWaitCondition(this, 'CfnWaitCondition' + Date.now(), {
-      handle: waitCompletionUrl,
-      timeout: '7200',
-      count: 1,
-    });
-
     const fn = new aws_lambda_nodejs.NodejsFunction(this, 'wait-handler', {
       runtime: aws_lambda.Runtime.NODEJS_18_X,
       environment: {
@@ -159,6 +153,12 @@ export class SagmakerPipeline extends Construct {
         runEveryTime: Date.now().toString(),
       },
       role,
+    });
+
+    new aws_cloudformation.CfnWaitCondition(this, 'CfnWaitCondition' + Date.now(), {
+      handle: waitCompletionUrl,
+      timeout: '7200',
+      count: 1,
     });
 
     build.onBuildSucceeded('BuildSucceed', {
