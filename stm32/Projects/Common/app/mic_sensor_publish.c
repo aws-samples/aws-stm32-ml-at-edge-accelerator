@@ -349,7 +349,7 @@ void vMicSensorPublishTask(void *pvParameters)
 			}
 			/* Write to */
 			bytesWritten = snprintf(payloadBuf, (size_t)MQTT_PUBLISH_MAX_LEN,
-									"{\"class\":\"%s\"}", sAiClassLabels[max_idx]);
+									"{\"class\":\"%s\", \"confidence\": \"%d\"}", sAiClassLabels[max_idx], (int)(100 * max_out));
 
 			LogInfo("%s", payloadBuf);
 			if (xIsMqttConnected() == pdTRUE)
