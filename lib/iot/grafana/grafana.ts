@@ -22,6 +22,7 @@ export class Grafana extends Construct {
     });
 
     const workspace = new aws_grafana.CfnWorkspace(this, 'Workspace', {
+      grafanaVersion: '8.4',
       accountAccessType: 'CURRENT_ACCOUNT',
       authenticationProviders: ['AWS_SSO'],
       permissionType: 'SERVICE_MANAGED',
