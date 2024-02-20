@@ -7,7 +7,7 @@ cffi==1.16.0
 cfgv==3.4.0
 charset-normalizer==3.3.2
 click==8.1.7
-cryptography==41.0.7
+cryptography==42.0.2
 distlib==0.3.8
 filelock==3.13.1
 identify==2.5.35
