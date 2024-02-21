@@ -107,7 +107,7 @@ export default (config: Config) => ({
             },
             measure: 'class',
             rawQuery:
-              "SELECT measure_value::varchar as Sounds, time  FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT measure_value::varchar as Sounds, time  FROM $__database.$__table WHERE device_name = '$device' AND measure_name = 'class' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
             refId: 'A',
             table: config.table,
           },
@@ -173,7 +173,7 @@ export default (config: Config) => ({
             key: 'Q-3a3019c1-e8b4-4dbb-a19d-4cd2db00d5b9-0',
             measure: 'class',
             rawQuery:
-              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})\n\n",
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND measure_name = 'class' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})\n\n",
             refId: 'A',
             table: config.table,
             waitForResult: true,
@@ -212,7 +212,7 @@ export default (config: Config) => ({
       ],
     },
     time: {
-      from: 'now-5m',
+      from: 'now-1m',
       to: 'now',
     },
     timepicker: {},
