@@ -19,7 +19,7 @@
       "envs": {
         "cicd": { "account": "<Account>", "region": "<Region>" },
         "ml": { "account": "<Account>", "region": "<Region>" },
-        "iot": [{ "name": "dev", "account": "<Region>", "region": "<Region>" }]
+        "iot": [{ "name": "dev", "account": "<Account>", "region": "<Region>" }]
       },
       "stUsernameSecret": "STDEVCLOUD_USERNAME_SECRET",
       "stPasswordSecret": "STDEVCLOUD_PASSWORD_SECRET",
