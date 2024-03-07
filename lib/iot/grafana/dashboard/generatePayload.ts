@@ -49,11 +49,11 @@ export default (config: Config) => ({
                 options: {
                   Knock: {
                     index: 0,
-                    text: '✊',
+                    text: 'Knock ✊',
                   },
                   Speech: {
                     index: 1,
-                    text: '💬',
+                    text: 'Speech 💬',
                   },
                 },
                 type: 'value',
@@ -77,9 +77,9 @@ export default (config: Config) => ({
         },
         gridPos: {
           h: 8,
-          w: 9,
+          w: 11,
           x: 0,
-          y: 0,
+          y: 7,
         },
         id: 7,
         options: {
@@ -138,11 +138,11 @@ export default (config: Config) => ({
         },
         gridPos: {
           h: 8,
-          w: 12,
-          x: 9,
-          y: 0,
+          w: 10,
+          x: 11,
+          y: 7,
         },
-        id: 5,
+        id: 3,
         options: {
           orientation: 'auto',
           reduceOptions: {
@@ -215,7 +215,7 @@ export default (config: Config) => ({
           x: 0,
           y: 0,
         },
-        id: 3,
+        id: 1,
         options: {
           alignValue: 'left',
           legend: {
@@ -284,7 +284,7 @@ export default (config: Config) => ({
           h: 7,
           w: 21,
           x: 0,
-          y: 7,
+          y: 15,
         },
         id: 1,
         options: {
