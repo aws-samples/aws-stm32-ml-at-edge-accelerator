@@ -39,6 +39,140 @@ export default (config: Config) => ({
     liveNow: false,
     panels: [
       {
+        fieldConfig: {
+          defaults: {
+            color: {
+              mode: 'thresholds',
+            },
+            mappings: [
+              {
+                options: {
+                  Knock: {
+                    index: 0,
+                    text: '✊',
+                  },
+                  Speech: {
+                    index: 1,
+                    text: '💬',
+                  },
+                },
+                type: 'value',
+              },
+            ],
+            thresholds: {
+              mode: 'absolute',
+              steps: [
+                {
+                  color: 'green',
+                  value: null,
+                },
+                {
+                  color: 'red',
+                  value: 80,
+                },
+              ],
+            },
+          },
+          overrides: [],
+        },
+        gridPos: {
+          h: 8,
+          w: 9,
+          x: 0,
+          y: 0,
+        },
+        id: 7,
+        options: {
+          colorMode: 'value',
+          graphMode: 'area',
+          justifyMode: 'auto',
+          orientation: 'auto',
+          reduceOptions: {
+            calcs: ['lastNotNull'],
+            fields: '/^measure_value::varchar$/',
+            values: false,
+          },
+          textMode: 'auto',
+        },
+        pluginVersion: '8.4.7',
+        targets: [
+          {
+            database: config.database,
+            datasource: {
+              type: 'grafana-timestream-datasource',
+              id: config.datasourceId,
+            },
+            measure: 'class',
+            rawQuery:
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND measure_name = 'class' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+            refId: 'A',
+            table: config.table,
+          },
+        ],
+        title: 'Class Detected',
+        type: 'stat',
+      },
+      {
+        fieldConfig: {
+          defaults: {
+            color: {
+              mode: 'thresholds',
+            },
+            mappings: [],
+            thresholds: {
+              mode: 'absolute',
+              steps: [
+                {
+                  color: 'red',
+                  value: null,
+                },
+                {
+                  color: 'green',
+                  value: 40,
+                },
+              ],
+            },
+            unit: 'percent',
+          },
+          overrides: [],
+        },
+        gridPos: {
+          h: 8,
+          w: 12,
+          x: 9,
+          y: 0,
+        },
+        id: 5,
+        options: {
+          orientation: 'auto',
+          reduceOptions: {
+            calcs: ['last'],
+            fields: '/^measure_value::varchar$/',
+            values: false,
+          },
+          showThresholdLabels: false,
+          showThresholdMarkers: true,
+          text: {},
+        },
+        pluginVersion: '8.4.7',
+        targets: [
+          {
+            database: config.database,
+            datasource: {
+              type: 'grafana-timestream-datasource',
+              id: config.datasourceId,
+            },
+            measure: 'class',
+            rawQuery:
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND measure_name = 'confidence' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+            refId: 'A',
+            table: config.table,
+          },
+        ],
+        title: 'Confidence Score',
+        type: 'gauge',
+      },
+      {
         datasource: {
           type: 'grafana-timestream-datasource',
           id: config.datasourceId,
