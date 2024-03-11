@@ -22,9 +22,7 @@ export class TimeStream extends Construct {
 
     const timeStreamAccessRole = new aws_iam.Role(this, 'topicIotTimeStreamRole', {
       assumedBy: new aws_iam.ServicePrincipal('iot.amazonaws.com'),
-      managedPolicies: [
-        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonTimestreamFullAccess'),
-      ],
+      managedPolicies: [aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonTimestreamFullAccess')],
     });
 
     const topicRule = new aws_iot.CfnTopicRule(this, 'TopicRule', {
@@ -38,13 +36,25 @@ export class TimeStream extends Construct {
               dimensions: [
                 {
                   name: 'device_name',
-                  value: '${topic(1)}',
+                  value: '${clientId()}',
+                },
+                {
+                  name: 'class',
+                  value: '${class}',
+                },
+                {
+                  name: 'confidence',
+                  value: '${confidence}',
+                },
+                {
+                  name: 'latitude',
+                  value: '${latitude}',
+                },
+                {
+                  name: 'longitude',
+                  value: '${longitude}',
                 },
               ],
-              timestamp: {
-                unit: 'MILLISECONDS',
-                value: '${timestamp()}',
-              },
               roleArn: timeStreamAccessRole.roleArn,
             },
           },

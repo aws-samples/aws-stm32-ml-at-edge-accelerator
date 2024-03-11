@@ -49,11 +49,11 @@ export default (config: Config) => ({
                 options: {
                   Knock: {
                     index: 0,
-                    text: 'Knock ✊',
+                    text: 'Knock',
                   },
                   Speech: {
                     index: 1,
-                    text: 'Speech 💬',
+                    text: 'Speech',
                   },
                 },
                 type: 'value',
@@ -89,7 +89,7 @@ export default (config: Config) => ({
           orientation: 'auto',
           reduceOptions: {
             calcs: ['lastNotNull'],
-            fields: '/^measure_value::varchar$/',
+            fields: '/^class$/',
             values: false,
           },
           textMode: 'auto',
@@ -104,7 +104,7 @@ export default (config: Config) => ({
             },
             measure: 'class',
             rawQuery:
-              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND measure_name = 'class' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
             refId: 'A',
             table: config.table,
           },
@@ -147,7 +147,7 @@ export default (config: Config) => ({
           orientation: 'auto',
           reduceOptions: {
             calcs: ['last'],
-            fields: '/^measure_value::varchar$/',
+            fields: '/^confidence$/',
             values: false,
           },
           showThresholdLabels: false,
@@ -162,9 +162,9 @@ export default (config: Config) => ({
               type: 'grafana-timestream-datasource',
               id: config.datasourceId,
             },
-            measure: 'class',
+            measure: 'confidence',
             rawQuery:
-              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND measure_name = 'confidence' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
             refId: 'A',
             table: config.table,
           },
@@ -241,13 +241,131 @@ export default (config: Config) => ({
             },
             measure: 'class',
             rawQuery:
-              "SELECT measure_value::varchar as Sounds, time  FROM $__database.$__table WHERE device_name = '$device' AND measure_name = 'class' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT class, time FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
             refId: 'A',
             table: config.table,
           },
         ],
         title: 'Visual',
         type: 'state-timeline',
+      },
+      {
+        fieldConfig: {
+          defaults: {
+            color: {
+              mode: 'thresholds',
+            },
+            custom: {
+              hideFrom: {
+                legend: false,
+                tooltip: false,
+                viz: false,
+              },
+            },
+            mappings: [],
+            thresholds: {
+              mode: 'absolute',
+              steps: [
+                {
+                  color: 'green',
+                  value: null,
+                },
+                {
+                  color: 'red',
+                  value: 80,
+                },
+              ],
+            },
+          },
+          overrides: [],
+        },
+        gridPos: {
+          h: 8,
+          w: 21,
+          x: 0,
+          y: 15,
+        },
+        id: 9,
+        options: {
+          basemap: {
+            config: {},
+            name: 'Layer 0',
+            type: 'default',
+          },
+          controls: {
+            mouseWheelZoom: true,
+            showAttribution: true,
+            showDebug: false,
+            showScale: false,
+            showZoom: true,
+          },
+          layers: [
+            {
+              config: {
+                showLegend: true,
+                style: {
+                  color: {
+                    fixed: 'dark-green',
+                  },
+                  opacity: 0.5,
+                  rotation: {
+                    fixed: 0,
+                    max: 360,
+                    min: -360,
+                    mode: 'mod',
+                  },
+                  size: {
+                    fixed: 7,
+                    max: 15,
+                    min: 2,
+                  },
+                  symbol: {
+                    fixed: 'img/icons/marker/circle.svg',
+                    mode: 'fixed',
+                  },
+                  textConfig: {
+                    fontSize: 12,
+                    offsetX: 0,
+                    offsetY: 0,
+                    textAlign: 'center',
+                    textBaseline: 'middle',
+                  },
+                },
+              },
+              location: {
+                latitude: 'lattitude',
+                longitude: 'longitude',
+                mode: 'coords',
+              },
+              name: 'marker',
+              tooltip: true,
+              type: 'markers',
+            },
+          ],
+          view: {
+            id: 'europe',
+            lat: 46,
+            lon: 14,
+            zoom: 4,
+          },
+        },
+        pluginVersion: '8.4.7',
+        targets: [
+          {
+            database: config.database,
+            datasource: {
+              type: 'grafana-timestream-datasource',
+              id: config.datasourceId,
+            },
+            measure: 'class',
+            rawQuery:
+              "SELECT CAST(latitude as DOUBLE) as lattitude, CAST(longitude as DOUBLE) as longitude, device_name, time FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+            refId: 'A',
+            table: config.table,
+          },
+        ],
+        title: 'Location',
+        type: 'geomap',
       },
       {
         datasource: {
@@ -307,7 +425,7 @@ export default (config: Config) => ({
             key: 'Q-3a3019c1-e8b4-4dbb-a19d-4cd2db00d5b9-0',
             measure: 'class',
             rawQuery:
-              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND measure_name = 'class' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})\n\n",
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
             refId: 'A',
             table: config.table,
             waitForResult: true,
