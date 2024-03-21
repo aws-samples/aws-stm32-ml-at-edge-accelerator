@@ -104,7 +104,7 @@ export default (config: Config) => ({
             },
             measure: 'class',
             rawQuery:
-              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to}) ORDER BY time ASC",
             refId: 'A',
             table: config.table,
           },
@@ -164,7 +164,7 @@ export default (config: Config) => ({
             },
             measure: 'confidence',
             rawQuery:
-              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to}) ORDER BY time ASC",
             refId: 'A',
             table: config.table,
           },
@@ -241,7 +241,7 @@ export default (config: Config) => ({
             },
             measure: 'class',
             rawQuery:
-              "SELECT class, time FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT class, time FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to}) ORDER BY time ASC",
             refId: 'A',
             table: config.table,
           },
@@ -359,7 +359,7 @@ export default (config: Config) => ({
             },
             measure: 'class',
             rawQuery:
-              "SELECT CAST(latitude as DOUBLE) as lattitude, CAST(longitude as DOUBLE) as longitude, device_name, time FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT CAST(latitude as DOUBLE) as lattitude, CAST(longitude as DOUBLE) as longitude, device_name, time FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to}) ORDER BY time ASC",
             refId: 'A',
             table: config.table,
           },
@@ -425,7 +425,7 @@ export default (config: Config) => ({
             key: 'Q-3a3019c1-e8b4-4dbb-a19d-4cd2db00d5b9-0',
             measure: 'class',
             rawQuery:
-              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to})",
+              "SELECT * FROM $__database.$__table WHERE device_name = '$device' AND time BETWEEN from_milliseconds(${__from}) AND from_milliseconds(${__to}) ORDER BY time ASC",
             refId: 'A',
             table: config.table,
             waitForResult: true,
