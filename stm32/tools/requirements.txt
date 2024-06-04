@@ -11,7 +11,7 @@ cryptography==42.0.4
 distlib==0.3.8
 filelock==3.13.1
 identify==2.5.35
-idna==3.6
+idna==3.7
 imgtool==1.9.0
 intelhex==2.3.0
 Jinja2==3.1.3
