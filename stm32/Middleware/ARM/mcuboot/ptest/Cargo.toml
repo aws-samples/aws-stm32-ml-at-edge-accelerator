@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 chrono = "0.4"
 env_logger = "0.6.0"
-failure = "0.1.5"
+failure = "1.0.1"
 log = "0.4.6"
 num_cpus = "1.9"
 std-semaphore = "0.1"
