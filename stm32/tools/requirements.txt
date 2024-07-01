@@ -31,5 +31,5 @@ PyYAML==6.0.1
 requests==2.32.0
 s3transfer==0.5.2
 six==1.16.0
-urllib3==1.26.18
+urllib3==1.26.19
 virtualenv==20.25.0
