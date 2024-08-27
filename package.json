@@ -28,7 +28,7 @@
     "aws-cdk-lib": "2.128.0",
     "aws-lambda": "^1.0.7",
     "aws-sdk": "^2.1562.0",
-    "axios": "^1.6.0",
+    "axios": "^1.7.4",
     "constructs": "^10.0.0",
     "esbuild": "^0.17.19",
     "source-map-support": "^0.5.21",
