@@ -15,7 +15,7 @@ onnxruntime==1.14.1
 optuna==3.1.1
 imgaug==0.4.0
 matplotlib==3.6.2
-opencv_python==4.6.0.66
+opencv_python==4.8.1.78
 joblib==1.2.0
 librosa==0.10.0.post2
 mako==1.2.4
