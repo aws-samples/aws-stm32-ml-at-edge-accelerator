@@ -463,7 +463,7 @@ NetworkContext_t * mbedtls_transport_allocate( void )
 {
     TLSContext_t * pxTLSCtx = NULL;
 
-    pxTLSCtx = ( TLSContext_t * ) pvPortMalloc( sizeof( TLSContext_t ) );
+    pxTLSCtx = ( TLSContext_t * ) mbedtls_platform_calloc( 1, sizeof( TLSContext_t ) );
 
     if( pxTLSCtx == NULL )
     {
@@ -1473,7 +1473,7 @@ int32_t mbedtls_transport_setrecvcallback( NetworkContext_t * pxNetworkContext,
 
     if( pxNotifyThreadCtx == NULL )
     {
-        pxNotifyThreadCtx = pvPortMalloc( sizeof( NotifyThreadCtx_t ) );
+        pxNotifyThreadCtx = mbedtls_platform_calloc(1, sizeof( NotifyThreadCtx_t ) );
 
         if( pxNotifyThreadCtx == NULL )
         {
