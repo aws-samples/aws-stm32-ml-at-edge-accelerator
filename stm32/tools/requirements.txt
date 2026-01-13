@@ -32,4 +32,4 @@ requests==2.32.4
 s3transfer==0.5.2
 six==1.16.0
 urllib3==1.26.19
-virtualenv==20.26.6
+virtualenv==20.36.1
