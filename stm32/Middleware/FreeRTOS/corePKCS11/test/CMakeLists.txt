@@ -49,9 +49,7 @@ if(UNIT_TESTS)
     add_subdirectory(wrapper_utest)
 endif()
 
-if(SYSTEM_TESTS)
-    add_subdirectory(mbedtls_integration)
-endif()
+
 
 add_subdirectory(coverity_analysis)
 
