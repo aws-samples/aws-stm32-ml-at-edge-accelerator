@@ -18,7 +18,7 @@ matplotlib==3.6.2
 opencv_python==4.8.1.78
 joblib==1.2.0
 librosa==0.10.0.post2
-mako==1.2.4
+mako==1.4.2
 pyserial==3.5
 boto3
 botocore
